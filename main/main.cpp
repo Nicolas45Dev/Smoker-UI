@@ -36,6 +36,7 @@ void runController(void *pvParameter) {
  * 
  */
 void setup() {
+<<<<<<< HEAD
     // //gpio_pad_select_gpio(ENCA_PIN);
     // gpio_set_direction(ENCA_PIN, GPIO_MODE_INPUT);
 
@@ -44,6 +45,16 @@ void setup() {
 
     // //gpio_pad_select_gpio(BUTTON_PIN);
     // gpio_set_direction(BUTTON_PIN, GPIO_MODE_INPUT);
+=======
+    //gpio_pad_select_gpio(ENCA_PIN);
+    gpio_set_direction(ENCA_PIN, GPIO_MODE_INPUT);
+
+    //gpio_pad_select_gpio(ENCB_PIN);
+    gpio_set_direction(ENCB_PIN, GPIO_MODE_INPUT);
+
+    //gpio_pad_select_gpio(BUTTON_PIN);
+    gpio_set_direction(BUTTON_PIN, GPIO_MODE_INPUT);
+>>>>>>> 69705bb (Setup main page)
 
     // gpio_set_intr_type(ENCA_PIN, GPIO_INTR_NEGEDGE);
     // gpio_set_intr_type(BUTTON_PIN, GPIO_INTR_NEGEDGE);

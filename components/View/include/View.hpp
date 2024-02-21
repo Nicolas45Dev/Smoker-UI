@@ -8,10 +8,10 @@
 #include "u8g2.h"
 #include <u8g2_esp32_hal.hpp>
 
-#define PIN_CLK (gpio_num_t)36
-#define PIN_MOSI (gpio_num_t)40
-#define PIN_RESET (gpio_num_t)38
-#define PIN_CS (gpio_num_t)39
+#define PIN_CLK (gpio_num_t)29
+#define PIN_MOSI (gpio_num_t)32
+#define PIN_RESET (gpio_num_t)31
+#define PIN_CS (gpio_num_t)30
 
 class View
 {
