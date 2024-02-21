@@ -34,7 +34,12 @@ void Controller::readModelData() {
 }
 
 void Controller::updateView() {
-    view.drawLogoPage();
+    if(time_tick > 20) {
+        view.drawMainPage();
+    }
+    else {
+        view.drawLogoPage();
+    }
 }
 
 void Controller::updateModel() {
