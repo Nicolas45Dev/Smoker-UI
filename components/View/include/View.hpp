@@ -17,6 +17,7 @@ class View
 {
 private:
     u8g2_t u8g2;
+    uint8_t index = 0;
 public:
     View(/* args */);
     ~View();

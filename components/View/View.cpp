@@ -36,10 +36,10 @@ void View::drawLogoPage() {
 
 void View::drawMainPage() {
     u8g2_ClearBuffer(&u8g2);
-    u8g2_DrawBitmap(&u8g2, 0, 10, 11, 46, tank);
-    // u8g2_DrawBitmap(&u8g2, 82, 12, 8, 8, thermometer);
-    // u8g2_DrawBitmap(&u8g2, 82, 36, 8, 8, thermometer);
-    // u8g2_DrawBitmap(&u8g2, 82, 24, 8, 8, time_icon);
-    // u8g2_DrawBitmap(&u8g2, 82, 48, 8, 8, time_icon);
+    //u8g2_DrawBitmap(&u8g2, 0, 10, 10, 36, tank);
+    u8g2_DrawBitmap(&u8g2, 82, 12, 1, 8, thermometer);
+    u8g2_DrawBitmap(&u8g2, 82, 36, 1, 8, thermometer);
+    u8g2_DrawBitmap(&u8g2, 82, 24, 1, 8, time_icon);
+    u8g2_DrawBitmap(&u8g2, 82, 48, 1, 8, time_icon);
     u8g2_SendBuffer(&u8g2);
 }
