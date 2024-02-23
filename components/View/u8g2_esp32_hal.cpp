@@ -16,7 +16,7 @@ static spi_device_handle_t handle_spi;   // SPI handle.
 static i2c_cmd_handle_t handle_i2c;      // I2C handle.
 static u8g2_esp32_hal_t u8g2_esp32_hal;  // HAL state data.
 
-#define HOST    SPI1_HOST
+#define HOST    SPI2_HOST
 
 #undef ESP_ERROR_CHECK
 #define ESP_ERROR_CHECK(x)                   \
@@ -66,6 +66,7 @@ uint8_t u8g2_esp32_spi_byte_cb(u8x8_t* u8x8,
       bus_config.miso_io_num = GPIO_NUM_NC;                  // MISO
       bus_config.quadwp_io_num = GPIO_NUM_NC;                // Not used
       bus_config.quadhd_io_num = GPIO_NUM_NC;                // Not used
+      // Check if the SPI host is already initialized
       // ESP_LOGI(TAG, "... Initializing bus.");
       ESP_ERROR_CHECK(spi_bus_initialize(HOST, &bus_config, 0));
 

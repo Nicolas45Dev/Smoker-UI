@@ -8,13 +8,14 @@
 
 typedef union 
 {
-        float data_float;
-        int32_t data_int;
+    float data_float;
+    int32_t data_int;
 } sensor_data;
 
 typedef struct {
     uint8_t sensor_id;
     uint8_t sensor_type;
+    uint8_t data_type;
     sensor_data data;
     ISensors *sensor;
 } sensor_data_t;

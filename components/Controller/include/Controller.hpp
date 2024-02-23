@@ -4,6 +4,7 @@
 #include <esp_log.h>
 #include <stdio.h>
 #include <View.hpp>
+#include <Model.hpp>
 
 #define THERMOMETER_UPDATE_INTERVAL 5
 #define THERMOCOUPLE_UPDATE_INTERVAL 2
@@ -15,6 +16,7 @@ private:
     uint8_t thermocouple_update_tick = 0;
     uint32_t time_tick = 0;
     View view;
+    Model model;
 
     void readModelData();
     void updateView();

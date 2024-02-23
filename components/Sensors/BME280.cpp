@@ -30,7 +30,7 @@ void BME280::readCalibrationData() {
     uint8_t spi_byte = BME280_CALIB_00_REG ^ 0x80;
     uint8_t tx_buffer[20];
 
-    SPI::getInstance().writeRead(tx_buffer, 20, &spi_byte, 1);
+    //SPI::getInstance().writeRead(tx_buffer, 20, &spi_byte, 1);
 
     // dig_T1 = (data[0] >> 8) | (data[1] << 8);
     // dig_T2 = (int16_t)(data[0] >> 8) | (data[1] << 8);

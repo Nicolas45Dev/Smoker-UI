@@ -2,7 +2,6 @@
 
 Model::Model() {
     // Create and add the sensors
-    
 }
 
 Model::~Model() {
@@ -33,6 +32,10 @@ void Model::addSensorData(uint8_t sensor_id, uint8_t sensor_type, ISensors * sen
 
 sensor_data Model::readDateFromSensor(uint8_t sensor_id) {
     sensor_data new_data;
-    new_data.data_float = 0.0;
+    for(const auto& sensor : sensors_data) {
+        if (sensor.sensor_id == sensor_id) {
+            new_data = sensor.data;
+        }
+    }
     return new_data;
 }

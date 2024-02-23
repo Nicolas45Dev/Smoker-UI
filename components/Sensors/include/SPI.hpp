@@ -13,7 +13,7 @@
 #define PIN_CS (gpio_num_t)39
 #define CLK_SPEED 25 * 1000 * 1000
 
-#define HOST_SPI SPI0_HOST
+#define HOST_SPI SPI2_HOST
 
 class SPI
 {

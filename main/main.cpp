@@ -1,15 +1,10 @@
 #include "Controller.hpp"
 #include <driver/gpio.h>
-#include <driver/spi_master.h>
 #include <esp_log.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 #include <stdio.h>
 #include <string.h>
-
-#define ENCA_PIN GPIO_NUM_34
-#define ENCB_PIN GPIO_NUM_35
-#define BUTTON_PIN GPIO_NUM_32
 
 #undef ESP_ERROR_CHECK
 #define ESP_ERROR_CHECK(x)   do { esp_err_t rc = (x); if (rc != ESP_OK) { ESP_LOGE("err", "esp_err_t = %d", rc); assert(0 && #x);} } while(0);
@@ -36,25 +31,14 @@ void runController(void *pvParameter) {
  * 
  */
 void setup() {
-<<<<<<< HEAD
-    // //gpio_pad_select_gpio(ENCA_PIN);
-    // gpio_set_direction(ENCA_PIN, GPIO_MODE_INPUT);
-
-    // //gpio_pad_select_gpio(ENCB_PIN);
-    // gpio_set_direction(ENCB_PIN, GPIO_MODE_INPUT);
-
-    // //gpio_pad_select_gpio(BUTTON_PIN);
-    // gpio_set_direction(BUTTON_PIN, GPIO_MODE_INPUT);
-=======
     //gpio_pad_select_gpio(ENCA_PIN);
-    gpio_set_direction(ENCA_PIN, GPIO_MODE_INPUT);
+    //gpio_set_direction(ENCA_PIN, GPIO_MODE_INPUT);
 
     //gpio_pad_select_gpio(ENCB_PIN);
-    gpio_set_direction(ENCB_PIN, GPIO_MODE_INPUT);
+    //gpio_set_direction(ENCB_PIN, GPIO_MODE_INPUT);
 
     //gpio_pad_select_gpio(BUTTON_PIN);
-    gpio_set_direction(BUTTON_PIN, GPIO_MODE_INPUT);
->>>>>>> 69705bb (Setup main page)
+    //gpio_set_direction(BUTTON_PIN, GPIO_MODE_INPUT);
 
     // gpio_set_intr_type(ENCA_PIN, GPIO_INTR_NEGEDGE);
     // gpio_set_intr_type(BUTTON_PIN, GPIO_INTR_NEGEDGE);
@@ -65,7 +49,7 @@ void setup() {
 }
 
 extern "C" void app_main() {
-    setup();
+    //setup();
 
     xTaskCreate(runController, "runController", 8192, NULL, 4, NULL);
 }
