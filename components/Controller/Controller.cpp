@@ -21,7 +21,11 @@ void Controller::run() {
         //read bme280 data
         bme280.read();
         float temp = bme280.getTemperature();
+        float pressure = bme280.getPressure();
+        float humidity = bme280.getHumidity();
         printf("Temperature: %f\n", temp);
+        printf("Pressure: %f\n", pressure);
+        printf("Humidity: %f\n", humidity);
     }
 
     if (time_tick % THERMOCOUPLE_UPDATE_INTERVAL == 0) {
@@ -46,7 +50,7 @@ void Controller::run() {
 
 void Controller::readModelData() {
     // read data from model
-    model.readAllSensors();
+    //model.readAllSensors();
 }
 
 void Controller::updateView() {

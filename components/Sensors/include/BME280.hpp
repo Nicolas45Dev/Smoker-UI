@@ -32,7 +32,11 @@
 #define BME280_ID_REG 0xD0
 
 #define BME280_CALIB_00_REG 0x88
-#define BME280_CALIB_26_REG 0xE1
+#define BME280_CALIB_HUM_2_REG 0xE1
+#define BME280_CALIB_HUM_1_REG 0xA1
+#define BME280_CALIB_HUM_3_REG 0xE3
+#define BME280_CALIB_HUM_4_REG 0xE4
+#define BME280_CALIB_HUM_5_REG 0xE5
 
 #define BME280_ADDRESS 0x76
 
@@ -58,10 +62,12 @@ private:
     uint8_t dig_H3;
     int16_t dig_H4;
     int16_t dig_H5;
+    int8_t dig_H6;
 
     float temperature;
     float pressure;
     float humidity;
+    uint32_t t_fine;
 
     void readTemperature();
     void readPressure();

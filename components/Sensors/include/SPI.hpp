@@ -65,7 +65,6 @@ public:
      */
     void read(uint8_t* data, size_t len, gpio_num_t pin_cs);
 
-    // TODO: Implement this method
     void writeRead(uint8_t* tx_data, size_t tx_len, uint8_t* rx_data, size_t rx_len, gpio_num_t pin_cs);
 };
 
