@@ -11,10 +11,10 @@
 #include <u8g2_esp32_hal.hpp>
 #include <string>
 
-#define PIN_CLK GPIO_NUM_36
-#define PIN_MOSI GPIO_NUM_40
-#define PIN_RESET GPIO_NUM_38
-#define PIN_CS GPIO_NUM_39
+#define PIN_CLK (gpio_num_t)40
+#define PIN_MOSI (gpio_num_t)41
+#define PIN_RESET (gpio_num_t)45
+#define PIN_CS (gpio_num_t)42
 
 class View
 {

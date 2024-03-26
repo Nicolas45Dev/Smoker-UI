@@ -8,11 +8,10 @@
 #include <Sensors.hpp>
 #include <string.h>
 #include <SPI.hpp>
+#include <freertos/FreeRTOS.h>
+#include <freertos/task.h>
 
-#define PIN_CLK (gpio_num_t)36
-#define PIN_MOSI (gpio_num_t)40
-#define PIN_RESET (gpio_num_t)38
-#define PIN_CS (gpio_num_t)39
+#define BME280_CS (gpio_num_t)18
 
 #define BME280_HUM_LSB_REG 0xFE
 #define BME280_HUM_MSB_REG 0xFD
@@ -40,7 +39,7 @@
 class BME280 : public ISensors
 {
 private:
-    spi_device_handle_t spi;
+    SPI* spi;
 
     uint16_t dig_T1;
     int16_t dig_T2;
@@ -64,10 +63,14 @@ private:
     float pressure;
     float humidity;
 
-    void readCalibrationData();
     void readTemperature();
     void readPressure();
     void readHumidity();
+    void readCalibrationData();
+    uint8_t setBit(bool read, uint8_t reg);
+    void setCtrlMeas();
+    void setCtrlHum();
+    void setConfig();
 public:
     BME280();
     ~BME280();

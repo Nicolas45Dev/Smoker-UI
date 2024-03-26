@@ -4,10 +4,11 @@
 #include <esp_log.h>
 #include <stdio.h>
 #include <View.hpp>
-#include <Model.hpp>
+#include <stdint.h>
+#include <BME280.hpp>
 
-#define THERMOMETER_UPDATE_INTERVAL 5
-#define THERMOCOUPLE_UPDATE_INTERVAL 2
+#define THERMOMETER_UPDATE_INTERVAL 20
+#define THERMOCOUPLE_UPDATE_INTERVAL 20
 
 class Controller
 {
@@ -16,7 +17,8 @@ private:
     uint8_t thermocouple_update_tick = 0;
     uint32_t time_tick = 0;
     View view;
-    Model model;
+
+    BME280 bme280;
 
     void readModelData();
     void updateView();

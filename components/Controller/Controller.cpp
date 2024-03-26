@@ -17,8 +17,31 @@ Controller::~Controller() {
 void Controller::run() {
     time_tick++;
 
+    if (time_tick % 20 == 0) {
+        //read bme280 data
+        bme280.read();
+        float temp = bme280.getTemperature();
+        printf("Temperature: %f\n", temp);
+    }
+
+    if (time_tick % THERMOCOUPLE_UPDATE_INTERVAL == 0) {
+        // read thermocouple data
+        // uint8_t data[4];
+        // spi->read(data, 4, GPIO_NUM_19);
+
+        // uint32_t data32 = (data[0] << 24) | (data[1] << 16) | (data[2] << 8) | data[3];
+        // if(data32 & 0x07) {
+        //     ESP_LOGE("Controller", "Thermocouple data error");
+        //     return;
+        // }
+        // data32 = data32 >> 18;
+        // ESP_LOGI("Controller", "Thermocouple data: %lu", data32);
+        // float temp = data32 * 0.25;
+        // ESP_LOGI("Controller", "Thermocouple temperature: %f", temp);
+    }
+
     // update view
-    updateView();
+    //updateView();
 }
 
 void Controller::readModelData() {
