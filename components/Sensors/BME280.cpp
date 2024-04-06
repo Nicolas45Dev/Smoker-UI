@@ -23,16 +23,6 @@ BME280::BME280() {
 BME280::~BME280() {
 }
 
-void BME280::read() {
-    readTemperature();
-    readPressure();
-    readHumidity();
-}
-
-bool BME280::init() {
-    return true;
-}
-
 float BME280::getTemperature() {
     return temperature;
 }
@@ -52,8 +42,6 @@ void BME280::readCalibrationData() {
     tx_buffer[0] = spi_byte;
     uint8_t rx_buffer[32];
     spi->writeRead(tx_buffer, 32, rx_buffer, 32, BME280_CS);
-
-    printf("Calibration data: ");
 
     // Set the calibration data
     uint16_t temp = (rx_buffer[2] << 8) | rx_buffer[1];
@@ -108,14 +96,6 @@ void BME280::readCalibrationData() {
     dig_H4 = (int16_t)((rx_buffer[4] << 4) | (rx_buffer[5] & 0x0F));
     dig_H5 = (int16_t)((rx_buffer[6] << 4) | ((rx_buffer[5] >> 4) & 0x0F));
     dig_H6 = (int8_t)rx_buffer[7];
-
-    printf("dig_H1: %d\n", dig_H1);
-    printf("dig_H2: %d\n", dig_H2);
-    printf("dig_H3: %d\n", dig_H3);
-    printf("dig_H4: %d\n", dig_H4);
-    printf("dig_H5: %d\n", dig_H5);
-    printf("dig_H6: %d\n", dig_H6);
-
 }
 
 void BME280::readTemperature() {
@@ -133,7 +113,6 @@ void BME280::readTemperature() {
     var1 = ((((adc_T >> 3) - ((int32_t)dig_T1 << 1))) * ((int32_t)dig_T2)) >> 11;
     var2 = (((((adc_T >> 4) - ((int32_t)dig_T1)) * ((adc_T >> 4) - ((int32_t)dig_T1))) >> 12) * ((int32_t)dig_T3)) >> 14;
     t_fine = var1 + var2;
-    printf("t_fine: %lu\n", t_fine);
 
     temperature = (float)((t_fine * 5 + 128) >> 8) / 100;
 }
@@ -150,7 +129,6 @@ void BME280::readPressure() {
 
     int64_t var1, var2, p;
     var1 = ((int64_t)t_fine) - 128000;
-    printf("t_fine: %lu\n", t_fine);
     var2 = var1 * var1 * (int64_t)dig_P6;
     var2 = var2 + ((var1 * (int64_t)dig_P5) << 17);
     var2 = var2 + (((int64_t)dig_P4) << 35);
@@ -176,14 +154,25 @@ void BME280::readHumidity() {
 
     uint32_t adc_H = (rx_buffer[1] << 8) | rx_buffer[2];
 
-    int32_t v_x1_u32r;
-    v_x1_u32r = (t_fine - ((int32_t)76800));
-    v_x1_u32r = (((((adc_H << 14) - (((int32_t)dig_H4) << 20) - (((int32_t)dig_H5) * v_x1_u32r)) + ((int32_t)16384)) >> 15) * (((((((v_x1_u32r * ((int32_t)dig_H6)) >> 10) * (((v_x1_u32r * ((int32_t)dig_H3)) >> 11) + ((int32_t)32768))) >> 10) + ((int32_t)2097152)) * ((int32_t)dig_H2) + 8192) >> 14));
-    v_x1_u32r = (v_x1_u32r - (((((v_x1_u32r >> 15) * (v_x1_u32r >> 15)) >> 7) * ((int32_t)dig_H1)) >> 4));
-    v_x1_u32r = (v_x1_u32r < 0 ? 0 : v_x1_u32r);
-    v_x1_u32r = (v_x1_u32r > 419430400 ? 419430400 : v_x1_u32r);
+    int32_t var1, var2, var3, var4, var5;
 
-    humidity = (float)(v_x1_u32r >> 12) / 1024.0;
+    var1 = t_fine - (int32_t)76800;
+    var2 = (int32_t)(adc_H * 16384);
+    var3 = (int32_t)(((int32_t)dig_H4) * 1048576);
+    var4 = ((int32_t)dig_H5) * var1;
+    var5 = (((var2 - var3) - var4) + (int32_t)16384) / 32768;
+    var2 = (var1 * ((int32_t)dig_H6)) / 1024;
+    var3 = (var1 * ((int32_t)dig_H3)) / 2048;
+    var4 = ((var2 * (var3 + (int32_t)32768)) / 1024) + (int32_t)2097152;
+    var2 = ((var4 * ((int32_t)dig_H2)) + 8192) / 16384;
+    var3 = var5 * var2;
+    var4 = ((var3 / 32768) * (var3 / 32768)) / 128;
+    var5 = var3 - ((var4 * ((int32_t)dig_H1)) / 16);
+    var5 = var5 < 0 ? 0 : var5;
+    var5 = var5 > 419430400 ? 419430400 : var5;
+    uint32_t h = (uint32_t)(var5 / 4096);
+
+    humidity = (float)h / 1024.0;
 }
 
 uint8_t BME280::setBit(bool read, uint8_t reg) {

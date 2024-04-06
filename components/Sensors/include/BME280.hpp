@@ -5,7 +5,6 @@
 #include <driver/spi_master.h>
 #include <esp_log.h>
 #include <stdint.h>
-#include <Sensors.hpp>
 #include <string.h>
 #include <SPI.hpp>
 #include <freertos/FreeRTOS.h>
@@ -40,7 +39,7 @@
 
 #define BME280_ADDRESS 0x76
 
-class BME280 : public ISensors
+class BME280
 {
 private:
     SPI* spi;
@@ -80,8 +79,6 @@ private:
 public:
     BME280();
     ~BME280();
-    void read() override;
-    bool init() override;
     float getTemperature();
     float getPressure();
     float getHumidity();

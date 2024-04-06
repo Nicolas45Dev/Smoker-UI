@@ -32,7 +32,7 @@ public:
     ~View();
     void initDisplay();
     void drawLogoPage();
-    void drawMainPage(float temp_tank1, float temp_meat1, float temp_meat2,
+    void drawMainPage(char* temp_tank1, char* temp_meat1, char* temp_meat2,
                         float set_temp_tank, float set_temp_meat1, float set_temp_meat2,
                         uint32_t time_meat1, uint32_t time_meat2);
     /**

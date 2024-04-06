@@ -32,7 +32,7 @@ void View::drawLogoPage() {
     u8g2_SendBuffer(&u8g2);
 }
 
-void View::drawMainPage(float temp_tank1, float temp_meat1, float temp_meat2,
+void View::drawMainPage(char* temp_tank1, char* temp_meat1, char* temp_meat2,
                         float set_temp_tank, float set_temp_meat1, float set_temp_meat2,
                         uint32_t time_meat1, uint32_t time_meat2)
 {
@@ -50,16 +50,21 @@ void View::drawMainPage(float temp_tank1, float temp_meat1, float temp_meat2,
     u8g2_DrawStr(&u8g2, 32, 7, "Smoker");
 
     // String for temperature tank
-    sprintf(buffer_t1, "%.0f", temp_tank1);
-    u8g2_DrawStr(&u8g2, 28, 32, buffer_t1);
+    u8g2_DrawStr(&u8g2, 28, 32, temp_tank1);
+    u8g2_DrawStr(&u8g2, 50, 32, "C");
+
+    u8g2_DrawLine(&u8g2, 26, 34, 56, 34);
+
+    // Write the target temperature for the tank under the current temperature
+    sprintf(buffer_t1, "%.1f", set_temp_tank);
+    u8g2_DrawStr(&u8g2, 28, 42, buffer_t1);
+    u8g2_DrawStr(&u8g2, 50, 42, "C");
 
     // String for temperature 1
-    sprintf(buffer_t2, "%.0f", temp_meat1);
-    u8g2_DrawStr(&u8g2, 92, 19, buffer_t2);
+    u8g2_DrawStr(&u8g2, 92, 19, temp_meat1);
 
     // String for temperature 2
-    sprintf(buffer_t3, "%.0f", temp_meat2);
-    u8g2_DrawStr(&u8g2, 92, 43, buffer_t3);
+    u8g2_DrawStr(&u8g2, 92, 43, temp_meat2);
 
     // String for time 1
     u8g2_DrawStr(&u8g2, 92, 31, std::to_string(time_meat1).c_str());

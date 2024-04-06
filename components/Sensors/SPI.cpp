@@ -38,6 +38,7 @@ esp_err_t SPI::init() {
         .queue_size = 8,
     };
 
+    this->is_init = true;
     return spi_bus_add_device(HOST_SPI, &m_devcfg, &m_spi);
 }
 

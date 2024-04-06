@@ -3,22 +3,19 @@
 
 #include <array>
 #include <esp_log.h>
+#include <MAX31855.hpp>
+#include <BME280.hpp>
 #include <stdio.h>
-#include <Sensors.hpp>
+#include <stdint.h>
+#include <string.h>
 
-typedef union 
-{
-    float data_float;
-    int32_t data_int;
-} sensor_data;
+#define THERMO_TANK_CS (gpio_num_t)19
+#define THERMO_MEAT1_CS (gpio_num_t)20
+#define THERMO_MEAT2_CS (gpio_num_t)21
 
-typedef struct {
-    uint8_t sensor_id;
-    uint8_t sensor_type;
-    uint8_t data_type;
-    sensor_data data;
-    ISensors *sensor;
-} sensor_data_t;
+#define THERMO_TANK_ACTIVE_LED (gpio_num_t)8
+#define THERMO_MEAT1_ACTIVE_LED (gpio_num_t)10
+#define THERMO_MEAT2_ACTIVE_LED (gpio_num_t)9
 
 /**
  * @brief This class represents the model of the MVC pattern
@@ -27,18 +24,24 @@ typedef struct {
 class Model
 {
 private:
-    uint8_t sensor_index = 0;
-    std::array<sensor_data_t, 12> sensors_data;
+    BME280 bme280;
+    MAX31855 thermo_tank;
+    MAX31855 thermo_meat1;
+    MAX31855 thermo_meat2;
 
-    void addSensorData(uint8_t sensor_id, uint8_t sensor_type, ISensors* sensor);
+    float thermo_tank_set_temp = 0;
+    float thermo_meat1_set_temp = 0;
+    float thermo_meat2_set_temp = 0;
+
 public:
     Model();
     ~Model();
 
-    void readSensor(uint8_t sensor_id);
-    void readAllSensors();
-
-    sensor_data readDateFromSensor(uint8_t sensor_id);
+    void readThermocouples(char* data, uint8_t sensor_index);
+    float readBME280(uint8_t sensor_index);
+    float getThermoTankSetTemp() { return thermo_tank_set_temp; }
+    float getThermoMeat1SetTemp() { return thermo_meat1_set_temp; }
+    float getThermoMeat2SetTemp() { return thermo_meat2_set_temp; }
 };
 
 #endif // MODEL_HPP
