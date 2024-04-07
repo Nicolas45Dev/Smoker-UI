@@ -9,26 +9,26 @@
 
 #undef ESP_ERROR_CHECK
 #define ESP_ERROR_CHECK(x)   do { esp_err_t rc = (x); if (rc != ESP_OK) { ESP_LOGE("err", "esp_err_t = %d", rc); assert(0 && #x);} } while(0);
-
-
-
-#define LEDC_TIMER              LEDC_TIMER_0
-#define LEDC_MODE               LEDC_LOW_SPEED_MODE
-#define LEDC_OUTPUT_IO          (12) // Define the output GPIO
-#define LEDC_CHANNEL            LEDC_CHANNEL_0
-#define LEDC_DUTY_RES           LEDC_TIMER_10_BIT // Set duty resolution to 13 bits
-#define LEDC_DUTY               (400) // Set duty to 50%. (2 ** 13) * 50% = 4096
-#define LEDC_FREQUENCY          (25000) // Frequency in Hertz. Set frequency at 4 kHz
+#define SW_PIN (gpio_num_t)6
+#define ENA_PIN (gpio_num_t)4
+#define INB_PIN (gpio_num_t)5
 
 Controller controller(100);
 
-// void IRAM_ATTR rotaryEncoderInterrupt(void *arg) {
-    
-// }
+bool option_change = false;
 
-// void IRAM_ATTR buttonInterrupt(void *arg) {
-    
-// }
+void IRAM_ATTR rotaryEncoderInterrupt(void *arg) {
+    // if ENB_PIN is high, then the direction is clockwise
+    if(gpio_get_level(INB_PIN)) {
+        controller.setOptionChange(true);
+    } else {
+        controller.setOptionChange(false);
+    }
+}
+
+void IRAM_ATTR buttonInterrupt(void *arg) {
+    controller.setPageChange();
+}
 
 void runController(void *pvParameter) {
     while(1) {
@@ -37,30 +37,55 @@ void runController(void *pvParameter) {
     }
 }
 
+void printDirection(void *pvParameter) {
+    while(1) {
+        if(option_change) {
+            ESP_LOGI("Direction", "Clockwise");
+        } else {
+            ESP_LOGI("Direction", "Counter Clockwise");
+        }
+        vTaskDelay(250 / portTICK_PERIOD_MS);
+    }
+}
+
 /**
  * @brief the system wiil be setup here before normal execution
  * 
  */
 void setup() {
-    //gpio_pad_select_gpio(ENCA_PIN);
-    //gpio_set_direction(ENCA_PIN, GPIO_MODE_INPUT);
+    // Set SW_PIN as input and internal on falling edge
+    gpio_config_t io_conf;
+    io_conf.intr_type = GPIO_INTR_NEGEDGE;
+    io_conf.mode = GPIO_MODE_INPUT;
+    io_conf.pin_bit_mask = (1ULL << SW_PIN);
+    io_conf.pull_down_en = GPIO_PULLDOWN_DISABLE;
+    io_conf.pull_up_en = GPIO_PULLUP_ENABLE;
+    gpio_config(&io_conf);
 
-    //gpio_pad_select_gpio(ENCB_PIN);
-    //gpio_set_direction(ENCB_PIN, GPIO_MODE_INPUT);
+    gpio_install_isr_service(0);
+    gpio_isr_handler_add(SW_PIN, buttonInterrupt, NULL);
 
-    //gpio_pad_select_gpio(BUTTON_PIN);
-    //gpio_set_direction(BUTTON_PIN, GPIO_MODE_INPUT);
+    // Set ENA_PIN as intput and interupt on falling edge
+    io_conf.intr_type = GPIO_INTR_NEGEDGE;
+    io_conf.mode = GPIO_MODE_INPUT;
+    io_conf.pin_bit_mask = (1ULL << ENA_PIN);
+    io_conf.pull_down_en = GPIO_PULLDOWN_DISABLE;
+    io_conf.pull_up_en = GPIO_PULLUP_DISABLE;
+    gpio_config(&io_conf);
 
-    // gpio_set_intr_type(ENCA_PIN, GPIO_INTR_NEGEDGE);
-    // gpio_set_intr_type(BUTTON_PIN, GPIO_INTR_NEGEDGE);
+    // set INB_PIN as input
+    io_conf.intr_type = GPIO_INTR_DISABLE;
+    io_conf.mode = GPIO_MODE_INPUT;
+    io_conf.pin_bit_mask = (1ULL << INB_PIN);
+    io_conf.pull_down_en = GPIO_PULLDOWN_DISABLE;
+    io_conf.pull_up_en = GPIO_PULLUP_ENABLE;
+    gpio_config(&io_conf);
 
-    // gpio_install_isr_service(0);
-    // gpio_isr_handler_add(ENCA_PIN, rotaryEncoderInterrupt, (void *) ENCA_PIN);
-    // gpio_isr_handler_add(BUTTON_PIN, buttonInterrupt, (void *) BUTTON_PIN);
+    gpio_isr_handler_add(ENA_PIN, rotaryEncoderInterrupt, NULL);
 }
 
 extern "C" void app_main() {
-    //setup();
+    setup();
 
     xTaskCreate(runController, "runController", 8192, NULL, 4, NULL);
 }

@@ -24,6 +24,10 @@
 class Model
 {
 private:
+    uint8_t page_index = 0;
+    uint8_t page_option = 0;
+    bool page_change = false;
+
     BME280 bme280;
     MAX31855 thermo_tank;
     MAX31855 thermo_meat1;
@@ -42,6 +46,10 @@ public:
     float getThermoTankSetTemp() { return thermo_tank_set_temp; }
     float getThermoMeat1SetTemp() { return thermo_meat1_set_temp; }
     float getThermoMeat2SetTemp() { return thermo_meat2_set_temp; }
+
+    void setPageChange(bool change, int8_t option_change = 0);
+    uint8_t getPageIndex() { return page_index; }
+    uint8_t getPageOption() { return page_option; }
 };
 
 #endif // MODEL_HPP

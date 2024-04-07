@@ -9,9 +9,14 @@
 #include <stdint.h>
 #include <BME280.hpp>
 #include <MAX31855.hpp>
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "freertos/semphr.h"
 
 #define THERMOMETER_UPDATE_INTERVAL 20
 #define THERMOCOUPLE_UPDATE_INTERVAL 20
+
+const uint8_t PAGE_OPTION_COUNT[2] = {6, 6};
 
 class Controller
 {
@@ -19,8 +24,12 @@ private:
     uint8_t bme280_update_tick = 0;
     uint8_t thermocouple_update_tick = 0;
     uint32_t time_tick = 0;
-
     uint8_t sensor_size = 0;
+    uint8_t page_option_max = 0;
+
+    bool page_change = false;
+    int8_t option_change = 0;
+    uint8_t previous_tick = 0;
 
     char thermo_tank[8];
     char thermo_meat1[8];
@@ -34,11 +43,14 @@ private:
     void readModelData();
     void updateView();
     void updateModel();
+
 public:
     Controller(uint8_t update_interval);
     ~Controller();
 
     void run();
+    void setPageChange();
+    void setOptionChange(bool direction);
 };
 
 #endif // CONTROLLER_HPP

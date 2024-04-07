@@ -47,3 +47,8 @@ float Model::readBME280(uint8_t sensor_index) {
     float all_values[3] = {bme280.getTemperature(), bme280.getPressure(), bme280.getHumidity()};
     return all_values[sensor_index];
 }
+
+void Model::setPageChange(bool change, int8_t option_change) {
+    page_change = change;
+    page_index++;
+}

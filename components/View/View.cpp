@@ -20,8 +20,6 @@ void View::initDisplay() {
         u8g2_esp32_spi_byte_cb,
         u8g2_esp32_gpio_and_delay_cb);  // init u8g2 structure
 
-    ESP_LOGI("View", "Init display");
-
     u8g2_InitDisplay(&u8g2); // send init sequence to the display, display is in sleep mode after this,
     u8g2_SetPowerSave(&u8g2, 0); // wake up display
 }
@@ -80,16 +78,16 @@ void View::drawMenuPage(uint8_t selected_option) {
     setPageHeader("Menu");
 
     if(selected_option < 2) {
-        u8g2_DrawButtonUTF8(&u8g2, 8, 20, button_style[selected_option == 0], 0, 2, 2, "Probe 1");
-        u8g2_DrawButtonUTF8(&u8g2, 8, 36, button_style[selected_option % 1], 0, 2, 2, "Probe 2");
+        u8g2_DrawButtonUTF8(&u8g2, 8, 20, button_style[selected_option == 0], 0, 2, 2, "Probe 1 : ON/OFF");
+        u8g2_DrawButtonUTF8(&u8g2, 8, 36, button_style[selected_option == 1], 0, 2, 2, "Probe 2 : ON/OFF");
     }
     else {
-        u8g2_DrawButtonUTF8(&u8g2, 8, 20, button_style[selected_option % 2], 0, 2, 2, "Meat profile");
-        u8g2_DrawButtonUTF8(&u8g2, 8, 36, button_style[selected_option % 3], 0, 2, 2, "Settings");
+        u8g2_DrawButtonUTF8(&u8g2, 8, 20, button_style[selected_option == 2], 0, 2, 2, "Meat profile");
+        u8g2_DrawButtonUTF8(&u8g2, 8, 36, button_style[selected_option == 3], 0, 2, 2, "Settings");
     }
 
-    u8g2_DrawButtonUTF8(&u8g2, 8, 60, button_style[selected_option % 4], 0, 2, 2, "Save");
-    u8g2_DrawButtonUTF8(&u8g2, 90, 60, button_style[selected_option % 5], 0, 2, 2, "Exit");
+    u8g2_DrawButtonUTF8(&u8g2, 8, 60, button_style[selected_option == 4], 0, 2, 2, "Save");
+    u8g2_DrawButtonUTF8(&u8g2, 90, 60, button_style[selected_option == 5], 0, 2, 2, "Exit");
 
     u8g2_SendBuffer(&u8g2);
 }
