@@ -94,6 +94,13 @@ public:
      * @param selected_option 
      */
     void drawSettingsPage(uint8_t selected_option);
+
+    /**
+     * @brief Show the save page
+     * 
+     * @param selected_option 
+     */
+    void drawStandbyPage(uint8_t selected_option);
 };
 
 #endif // VIEW_HPP

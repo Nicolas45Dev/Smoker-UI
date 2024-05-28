@@ -23,12 +23,37 @@ BME280::BME280() {
 BME280::~BME280() {
 }
 
-float BME280::getTemperature() {
-    return temperature;
+float BME280::getTemperature(TEMP_UNIT unit) {
+    float new_temperature = 0;
+
+    switch(unit) {
+        case FAHRENHEIT_UNIT:
+            new_temperature = CELSIUS_TO_FAHRENHEIT(temperature);
+        case KELVIN_UNIT:
+            new_temperature = CELSIUS_TO_KELVIN(temperature);
+        default:
+            return temperature;
+    }
+    return new_temperature;
 }
 
-float BME280::getPressure() {
-    return pressure;
+float BME280::getPressure(PERSSURE_UNIT unit) {
+    float new_pressure = 0;
+
+    switch(unit) {
+        case HPA_UNIT:
+            new_pressure = PASCAL_TO_HECTOPASCAL(pressure);
+        case PSI_UNIT:
+            new_pressure = PASCAL_TO_PSI(pressure);
+        case BAR_UNIT:
+            new_pressure = PASCAL_TO_BAR(pressure);
+        case ATM_UNIT:
+            new_pressure = PASCAL_TO_ATMOSPHERE(pressure);
+        default:
+            return pressure;
+    }
+
+    return new_pressure;
 }
 
 float BME280::getHumidity() {

@@ -2,6 +2,7 @@
 #define MODEL_HPP
 
 #include <array>
+#include "config/Config.h"
 #include <esp_log.h>
 #include <MAX31855.hpp>
 #include <BME280.hpp>
@@ -36,6 +37,8 @@ private:
     float thermo_tank_set_temp = 0;
     float thermo_meat1_set_temp = 0;
     float thermo_meat2_set_temp = 0;
+
+    TEMP_UNIT user_unit = DEFAULT_UNIT;
 
 public:
     Model();

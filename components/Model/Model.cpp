@@ -12,7 +12,7 @@ void Model::readThermocouples(char* data, uint8_t sensor_index) {
     switch (sensor_index) {
         case 0:
             if(thermo_tank.isProbeConnected()) {
-                temp = thermo_tank.readTemperature(CELSIUS_UNIT);
+                temp = thermo_tank.readTemperature(user_unit);
                 sprintf(data, "%.1f", temp);
             } 
             else {
@@ -21,7 +21,7 @@ void Model::readThermocouples(char* data, uint8_t sensor_index) {
             break;
         case 1:
             if(thermo_meat1.isProbeConnected()) {
-                temp = thermo_meat1.readTemperature(CELSIUS_UNIT);
+                temp = thermo_meat1.readTemperature(user_unit);
                 sprintf(data, "%.1f", temp);
             } 
             else {
@@ -30,7 +30,7 @@ void Model::readThermocouples(char* data, uint8_t sensor_index) {
             break;
         case 2:
             if(thermo_meat2.isProbeConnected()) {
-                temp = thermo_meat2.readTemperature(CELSIUS_UNIT);
+                temp = thermo_meat2.readTemperature(user_unit);
                 sprintf(data, "%.1f", temp);
             } 
             else {

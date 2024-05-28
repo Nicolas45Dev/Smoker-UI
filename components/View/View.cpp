@@ -35,7 +35,7 @@ void View::drawMainPage(page_params_t &page_params)
     char buffer_t1[10];
     char buffer_t2[10];
     char buffer_t3[10];
-    
+
     u8g2_ClearBuffer(&u8g2);
     u8g2_DrawBitmap(&u8g2, 0, 10, 10, 46, tank);
 
@@ -127,6 +127,12 @@ void View::drawSettingsPage(uint8_t selected_option) {
 
     u8g2_DrawButtonUTF8(&u8g2, 8, 60, button_style[selected_option == 4], 0, 2, 2, "Save");
     u8g2_DrawButtonUTF8(&u8g2, 90, 60, button_style[selected_option == 5], 0, 2, 2, "Exit");
+
+    u8g2_SendBuffer(&u8g2);
+}
+
+void View::drawStandbyPage(uint8_t selected_option) {
+    u8g2_ClearBuffer(&u8g2);
 
     u8g2_SendBuffer(&u8g2);
 }

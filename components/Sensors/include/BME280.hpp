@@ -1,6 +1,7 @@
 #ifndef BME280_HPP
 #define BME280_HPP
 
+#include "Config.h"
 #include <driver/gpio.h>
 #include <driver/spi_master.h>
 #include <esp_log.h>
@@ -85,14 +86,14 @@ public:
      * 
      * @return float 
      */
-    float getTemperature();
+    float getTemperature(TEMP_UNIT unit = DEFAULT_UNIT);
 
     /**
      * @brief Get the Pressure object
      * 
      * @return float 
      */
-    float getPressure();
+    float getPressure(PERSSURE_UNIT unit = DEFAULT_PRESSURE_UNIT);
 
     /**
      * @brief Get the Humidity object
