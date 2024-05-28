@@ -30,19 +30,14 @@ void View::drawLogoPage() {
     u8g2_SendBuffer(&u8g2);
 }
 
-void View::drawMainPage(char* temp_tank1, char* temp_meat1, char* temp_meat2,
-                        float set_temp_tank, float set_temp_meat1, float set_temp_meat2,
-                        uint32_t time_meat1, uint32_t time_meat2)
+void View::drawMainPage(page_params_t &page_params)
 {
     char buffer_t1[10];
     char buffer_t2[10];
     char buffer_t3[10];
+    
     u8g2_ClearBuffer(&u8g2);
     u8g2_DrawBitmap(&u8g2, 0, 10, 10, 46, tank);
-    u8g2_DrawBitmap(&u8g2, 82, 12, 1, 8, thermometer);
-    u8g2_DrawBitmap(&u8g2, 82, 36, 1, 8, thermometer);
-    u8g2_DrawBitmap(&u8g2, 82, 24, 1, 8, time_icon);
-    u8g2_DrawBitmap(&u8g2, 82, 48, 1, 8, time_icon);
 
     u8g2_SetFont(&u8g2, u8g2_font_tinytim_tr);
     u8g2_DrawStr(&u8g2, 32, 7, "Smoker");
@@ -58,17 +53,32 @@ void View::drawMainPage(char* temp_tank1, char* temp_meat1, char* temp_meat2,
     u8g2_DrawStr(&u8g2, 28, 42, buffer_t1);
     u8g2_DrawStr(&u8g2, 50, 42, "C");
 
-    // String for temperature 1
-    u8g2_DrawStr(&u8g2, 92, 19, temp_meat1);
+    if(page_params.option_change == 0) {
 
-    // String for temperature 2
-    u8g2_DrawStr(&u8g2, 92, 43, temp_meat2);
+        u8g2_DrawBitmap(&u8g2, 82, 12, 1, 8, thermometer);
+        u8g2_DrawBitmap(&u8g2, 82, 36, 1, 8, thermometer);
+        u8g2_DrawBitmap(&u8g2, 82, 24, 1, 8, time_icon);
+        u8g2_DrawBitmap(&u8g2, 82, 48, 1, 8, time_icon);
 
-    // String for time 1
-    u8g2_DrawStr(&u8g2, 92, 31, std::to_string(time_meat1).c_str());
+        // String for temperature 1
+        u8g2_DrawStr(&u8g2, 92, 19, temp_meat1);
+        // String for temperature 2
+        u8g2_DrawStr(&u8g2, 92, 43, temp_meat2);
 
-    // String for time 2
-    u8g2_DrawStr(&u8g2, 92, 55, std::to_string(time_meat2).c_str());
+        // String for time 1
+        u8g2_DrawStr(&u8g2, 92, 31, std::to_string(time_meat1).c_str());
+        // String for time 2
+        u8g2_DrawStr(&u8g2, 92, 55, std::to_string(time_meat2).c_str());
+    }
+    else {
+        u8g2_DrawBitmap(&u8g2, 82, 12, 1, 8, thermometer);
+        u8g2_DrawBitmap(&u8g2, 82, 24, 1, 8, thermometer);
+
+        // String for bme temperature
+        u8g2_DrawStr(&u8g2, 92, 19, params.bme280_data[0]);
+        // String for bme humidity
+        u8g2_DrawStr(&u8g2, 92, 31, params.bme280_data[2]);
+    }
 
     u8g2_SendBuffer(&u8g2);
 }
@@ -77,14 +87,8 @@ void View::drawMenuPage(uint8_t selected_option) {
     u8g2_ClearBuffer(&u8g2);
     setPageHeader("Menu");
 
-    if(selected_option < 2) {
-        u8g2_DrawButtonUTF8(&u8g2, 8, 20, button_style[selected_option == 0], 0, 2, 2, "Probe 1 : ON/OFF");
-        u8g2_DrawButtonUTF8(&u8g2, 8, 36, button_style[selected_option == 1], 0, 2, 2, "Probe 2 : ON/OFF");
-    }
-    else {
-        u8g2_DrawButtonUTF8(&u8g2, 8, 20, button_style[selected_option == 2], 0, 2, 2, "Meat profile");
-        u8g2_DrawButtonUTF8(&u8g2, 8, 36, button_style[selected_option == 3], 0, 2, 2, "Settings");
-    }
+    u8g2_DrawButtonUTF8(&u8g2, 8, 20, button_style[selected_option == 2], 0, 2, 2, "Meat profile");
+    u8g2_DrawButtonUTF8(&u8g2, 8, 36, button_style[selected_option == 3], 0, 2, 2, "Settings");
 
     u8g2_DrawButtonUTF8(&u8g2, 8, 60, button_style[selected_option == 4], 0, 2, 2, "Save");
     u8g2_DrawButtonUTF8(&u8g2, 90, 60, button_style[selected_option == 5], 0, 2, 2, "Exit");
@@ -107,6 +111,22 @@ void View::drawMeatSelectionPage(uint8_t selected_option) {
     
     
     u8g2_DrawButtonUTF8(&u8g2, 90, 60, button_style[selected_option % 5], 0, 2, 2, "Back");
+
+    u8g2_SendBuffer(&u8g2);
+}
+
+void View::drawSettingsPage(uint8_t selected_option) {
+    u8g2_ClearBuffer(&u8g2);
+    setPageHeader("Settings");
+
+    // Setting for the temperature unit
+    u8g2_DrawButtonUTF8(&u8g2, 8, 20, button_style[selected_option % 6], 0, 2, 2, "Temperature unit");
+
+    // Purge the pellet burner
+    u8g2_DrawButtonUTF8(&u8g2, 8, 36, button_style[selected_option % 5], 0, 2, 2, "Purge burner");
+
+    u8g2_DrawButtonUTF8(&u8g2, 8, 60, button_style[selected_option == 4], 0, 2, 2, "Save");
+    u8g2_DrawButtonUTF8(&u8g2, 90, 60, button_style[selected_option == 5], 0, 2, 2, "Exit");
 
     u8g2_SendBuffer(&u8g2);
 }

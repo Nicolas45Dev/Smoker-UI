@@ -37,17 +37,6 @@ void runController(void *pvParameter) {
     }
 }
 
-void printDirection(void *pvParameter) {
-    while(1) {
-        if(option_change) {
-            ESP_LOGI("Direction", "Clockwise");
-        } else {
-            ESP_LOGI("Direction", "Counter Clockwise");
-        }
-        vTaskDelay(250 / portTICK_PERIOD_MS);
-    }
-}
-
 /**
  * @brief the system wiil be setup here before normal execution
  * 
@@ -88,4 +77,7 @@ extern "C" void app_main() {
     setup();
 
     xTaskCreate(runController, "runController", 8192, NULL, 4, NULL);
+
+    // Here is the task for the coooking controller
+    //xTaskCreate(printDirection, "cooker", 4096, NULL, 5, NULL);
 }

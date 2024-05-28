@@ -26,11 +26,16 @@ The configuration for the system is keep at a high layer. The configuration is d
 # Planning
 Here is a simple descript ion of all the features that the UI will have. The features are divided into two categories, the features that are already implemented and the features that are still in development. The features are show on the first level of the list. The specific requirements of the features are shown on the second level of the list. The features that are already implemented are marked with a check mark. The features that are still in development are marked with a box.
 
-On the ESP32:
+Overall progress:
+
+![](https://geps.dev/progress/29)
+
+On the ESP32: (37)
 - [ ] Monitor the temperature of the smoker
   - [ ] Set the temperature of the smoker to reach and maintain 
+  - [x] Monitor the inside temperature of the smoker
 - [ ] Monitor the temperature of the meat
-    - [ ] Monitor at least two temperatures
+    - [x] Monitor at least two temperatures
     - [ ] Set the temperature of the meat to reach
 - [ ] Show the remaining time of the cooking
 - [ ] Have a BLE server to control the smoker from a mobile device
@@ -41,7 +46,7 @@ On the ESP32:
   - [x] Pork profile
   - [x] Beef profile
   - [x] Chicken profile
-  - [ ] Bacon profile
+  - [x] Bacon profile
   - [x] Cold smoke profile
   - [x] General cooking profile 
   - [ ] Custom page profile
@@ -55,16 +60,17 @@ On the ESP32:
 - [ ] Monitor the environment pressure
 - [ ] Have a simple UI to control the smoker
   - [x] Have a logo page
-  - [ ] Have a icon to monitor the smoker temperature
+  - [x] Have a icon to monitor the smoker temperature
   - [x] Have a icon to monitor the meat temperature (at least two temperatures)
   - [x] Have a menu to select the cooking profile
-  - [ ] Have a icon to show the remaining time of the cooking
+  - [x] Have a icon to show the remaining time of the cooking
   - [ ] Have a page to control the smoker heating element
   - [ ] Have a page to control the smoker fan
   - [ ] Have a page to control the smoker smoke generator
+  - [ ] Have a page to control the state of the smoker
   - [ ] Have a standby page
   
-On the mobile device:
+On the mobile device: (8)
 - [ ] Have a simple UI to control the smoker from a mobile device
   - [ ] Have meat temperature monitor
   - [ ] Have smoker temperature monitor

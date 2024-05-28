@@ -42,7 +42,22 @@ private:
 public:
     MAX31855(gpio_num_t pin_cs, gpio_num_t active_led);
     ~MAX31855();
+
+    /**
+     * @brief Check if the probe is connected
+     * NOTE: The function should be called before reading the temperature
+     * @return true The probe is connected
+     * @return false The probe is not connected
+     */
     bool isProbeConnected();
+
+    /**
+     * @brief Read the temperature from the MAX31855
+     * NOTE: The temperature is averaged over 5 readings
+     * NOTE: The function isProbeConnected() should be called before this function
+     * @param unit The unit to read the temperature in
+     * @return float The temperature in the specified unit
+     */
     float readTemperature(TEMP_UNIT unit = TEMP_UNIT::CELSIUS_UNIT);
 };
 

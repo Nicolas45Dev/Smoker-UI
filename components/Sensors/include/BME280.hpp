@@ -79,8 +79,26 @@ private:
 public:
     BME280();
     ~BME280();
+
+    /**
+     * @brief Get the Temperature object
+     * 
+     * @return float 
+     */
     float getTemperature();
+
+    /**
+     * @brief Get the Pressure object
+     * 
+     * @return float 
+     */
     float getPressure();
+
+    /**
+     * @brief Get the Humidity object
+     * 
+     * @return float 
+     */
     float getHumidity();
 };
 
