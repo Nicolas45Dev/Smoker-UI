@@ -39,18 +39,6 @@ private:
 
     std::array<MeatProfileData, 10> meat_profile_data;
 
-    // Set the meat profile in alphabetical order
-    meat_profile_data[0] = {0, "Bacon", 65, 120};
-    meat_profile_data[1] = {1, "Beef", 55, 90};
-    meat_profile_data[2] = {2, "Chicken", 84, 120};
-    meat_profile_data[3] = {3, "Cold Smoke", -1, -1};
-    meat_profile_data[4] = {4, "Fish", 60, 120};
-    meat_profile_data[5] = {5, "General smoking", -1, 120};
-    meat_profile_data[6] = {6, "Pork high", 96, 120};
-    meat_profile_data[7] = {7, "Pork low", 74, 120};
-    meat_profile_data[8] = {8, "Custom 1", -1, -1};
-    meat_profile_data[9] = {9, "Custom 2", -1, -1};
-
     void setPageHeader(const char *header);
 public:
     View(/* args */);

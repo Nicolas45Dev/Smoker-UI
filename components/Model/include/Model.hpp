@@ -2,7 +2,7 @@
 #define MODEL_HPP
 
 #include <array>
-#include "config/Config.h"
+#include "Config.h"
 #include <esp_log.h>
 #include <MAX31855.hpp>
 #include <BME280.hpp>
@@ -53,6 +53,7 @@ public:
     void setPageChange(bool change, int8_t option_change = 0);
     uint8_t getPageIndex() { return page_index; }
     uint8_t getPageOption() { return page_option; }
+    void setPageIndex(uint8_t index) { page_index = index; }
 };
 
 #endif // MODEL_HPP

@@ -1,6 +1,17 @@
 #include "View.hpp"
 
 View::View() {
+    // Set the meat profile in alphabetical order
+    this->meat_profile_data[0] = {0, "Bacon", 65, 120};
+    this->meat_profile_data[1] = {1, "Beef", 55, 90};
+    this->meat_profile_data[2] = {2, "Chicken", 84, 120};
+    this->meat_profile_data[3] = {3, "Cold Smoke", -1, -1};
+    this->meat_profile_data[4] = {4, "Fish", 60, 120};
+    this->meat_profile_data[5] = {5, "General smoking", -1, 120};
+    this->meat_profile_data[6] = {6, "Pork high", 96, 120};
+    this->meat_profile_data[7] = {7, "Pork low", 74, 120};
+    this->meat_profile_data[8] = {8, "Custom 1", -1, -1};
+    this->meat_profile_data[9] = {9, "Custom 2", -1, -1};
 }
 
 View::~View() {
@@ -43,17 +54,17 @@ void View::drawMainPage(page_params_t &page_params)
     u8g2_DrawStr(&u8g2, 32, 7, "Smoker");
 
     // String for temperature tank
-    u8g2_DrawStr(&u8g2, 28, 32, temp_tank1);
+    u8g2_DrawStr(&u8g2, 28, 32, page_params.temp_tank1);
     u8g2_DrawStr(&u8g2, 50, 32, "C");
 
     u8g2_DrawLine(&u8g2, 26, 34, 56, 34);
 
     // Write the target temperature for the tank under the current temperature
-    sprintf(buffer_t1, "%.1f", set_temp_tank);
+    sprintf(buffer_t1, "%.1f", page_params.set_temp_tank);
     u8g2_DrawStr(&u8g2, 28, 42, buffer_t1);
     u8g2_DrawStr(&u8g2, 50, 42, "C");
 
-    if(page_params.option_change == 0) {
+    if(page_params.selected_option == 0) {
 
         u8g2_DrawBitmap(&u8g2, 82, 12, 1, 8, thermometer);
         u8g2_DrawBitmap(&u8g2, 82, 36, 1, 8, thermometer);
@@ -61,23 +72,23 @@ void View::drawMainPage(page_params_t &page_params)
         u8g2_DrawBitmap(&u8g2, 82, 48, 1, 8, time_icon);
 
         // String for temperature 1
-        u8g2_DrawStr(&u8g2, 92, 19, temp_meat1);
+        u8g2_DrawStr(&u8g2, 92, 19, page_params.temp_meat1);
         // String for temperature 2
-        u8g2_DrawStr(&u8g2, 92, 43, temp_meat2);
+        u8g2_DrawStr(&u8g2, 92, 43, page_params.temp_meat2);
 
         // String for time 1
-        u8g2_DrawStr(&u8g2, 92, 31, std::to_string(time_meat1).c_str());
+        u8g2_DrawStr(&u8g2, 92, 31, std::to_string(page_params.time_meat1).c_str());
         // String for time 2
-        u8g2_DrawStr(&u8g2, 92, 55, std::to_string(time_meat2).c_str());
+        u8g2_DrawStr(&u8g2, 92, 55, std::to_string(page_params.time_meat2).c_str());
     }
     else {
         u8g2_DrawBitmap(&u8g2, 82, 12, 1, 8, thermometer);
         u8g2_DrawBitmap(&u8g2, 82, 24, 1, 8, thermometer);
 
         // String for bme temperature
-        u8g2_DrawStr(&u8g2, 92, 19, params.bme280_data[0]);
+        u8g2_DrawStr(&u8g2, 92, 19, std::to_string(page_params.bme280_data[0]).c_str());
         // String for bme humidity
-        u8g2_DrawStr(&u8g2, 92, 31, params.bme280_data[2]);
+        u8g2_DrawStr(&u8g2, 92, 31, std::to_string(page_params.bme280_data[2]).c_str());
     }
 
     u8g2_SendBuffer(&u8g2);

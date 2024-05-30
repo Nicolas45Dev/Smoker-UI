@@ -1,7 +1,7 @@
 #ifndef MAX31855_HPP
 #define MAX31855_HPP
 
-#include "config/Config.h"
+#include "Config.h"
 #include <driver/gpio.h>
 #include <SPI.hpp>
 #include <stdint.h>
