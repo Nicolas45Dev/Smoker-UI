@@ -21,11 +21,12 @@ typedef struct {
     char* temp_meat1;
     char* temp_meat2;
     float set_temp_tank;
-    float set_temp_meat1;
-    float set_temp_meat2;
+    char* set_temp_meat1;
+    char* set_temp_meat2;
     uint32_t time_meat1;
     uint32_t time_meat2;
-    float* bme280_data;
+    char* bme280_data_temp;
+    char* bme280_data_hum;
     uint8_t selected_option;
 } page_params_t;
 
@@ -89,6 +90,10 @@ public:
      * @param selected_option 
      */
     void drawStandbyPage(uint8_t selected_option);
+
+    MeatProfileData getMeatProfileData(uint8_t index) {
+        return meat_profile_data[index];
+    }
 };
 
 #endif // VIEW_HPP

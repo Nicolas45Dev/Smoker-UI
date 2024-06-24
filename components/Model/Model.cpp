@@ -43,12 +43,43 @@ void Model::readThermocouples(char* data, uint8_t sensor_index) {
     }
 }
 
-float Model::readBME280(uint8_t sensor_index) {
+float Model::readThermocouples(uint8_t sensor_index) {
+    float temp = 0;
+    switch (sensor_index) {
+        case 0:
+            if(thermo_meat1.isProbeConnected()) {
+                temp = thermo_meat1.readTemperature(user_unit);
+            } 
+            break;
+        case 1:
+            if(thermo_meat2.isProbeConnected()) {
+                temp = thermo_meat2.readTemperature(user_unit);
+            } 
+            break;
+        default:
+            temp = 0;
+            break;
+    }
+    return temp;
+}
+
+void Model::readBME280(uint8_t sensor_index, char* data) {
+    bme280.readAll();
+
     float all_values[3] = {bme280.getTemperature(), bme280.getPressure(), bme280.getHumidity()};
-    return all_values[sensor_index];
+
+    sprintf(data, "%.1f", all_values[sensor_index]);
 }
 
 void Model::setPageChange(bool change, int8_t option_change) {
-    page_change = change;
+    //page_change = change;
     page_index++;
+}
+
+void Model::getThermoMeat1SetTemp(char* data) {
+    sprintf(data, "%.1f", thermo_meat1_set_temp);
+}
+
+void Model::getThermoMeat2SetTemp(char* data) {
+    sprintf(data, "%.1f", thermo_meat2_set_temp);
 }

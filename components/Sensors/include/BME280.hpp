@@ -101,6 +101,8 @@ public:
      * @return float 
      */
     float getHumidity();
+
+    void readAll();
 };
 
 #endif // BME280_HPP

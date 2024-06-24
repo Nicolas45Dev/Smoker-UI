@@ -225,3 +225,17 @@ void BME280::setCtrlHum() {
     tx_buffer[1] = 0x01;
     spi->write(tx_buffer, 2, BME280_CS);
 }
+
+void BME280::setConfig() {
+    uint8_t spi_byte = BME280_CONFIG_REG;
+    uint8_t tx_buffer[2] = {0, 0};
+    tx_buffer[0] = setBit(false, spi_byte);
+    tx_buffer[1] = 0x00;
+    spi->write(tx_buffer, 2, BME280_CS);
+}
+
+void BME280::readAll() {
+    readTemperature();
+    readPressure();
+    readHumidity();
+}

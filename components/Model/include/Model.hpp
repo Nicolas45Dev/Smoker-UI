@@ -45,10 +45,14 @@ public:
     ~Model();
 
     void readThermocouples(char* data, uint8_t sensor_index);
-    float readBME280(uint8_t sensor_index);
+    void readBME280(uint8_t sensor_index, char* data);
     float getThermoTankSetTemp() { return thermo_tank_set_temp; }
-    float getThermoMeat1SetTemp() { return thermo_meat1_set_temp; }
-    float getThermoMeat2SetTemp() { return thermo_meat2_set_temp; }
+    void getThermoMeat1SetTemp(char* data);
+    void getThermoMeat2SetTemp(char* data);
+    float readThermocouples(uint8_t sensor_index);
+    void setThermoTankSetTemp(float temp) { thermo_tank_set_temp = temp; }
+    void setThermoMeat1SetTemp(float temp) { thermo_meat1_set_temp = temp; }
+    void setThermoMeat2SetTemp(float temp) { thermo_meat2_set_temp = temp; }
 
     void setPageChange(bool change, int8_t option_change = 0);
     uint8_t getPageIndex() { return page_index; }
