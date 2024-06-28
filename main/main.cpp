@@ -3,12 +3,13 @@
 #include <esp_log.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
-#include <stdio.h>
-#include <string.h>
+#include <cstdio>
+#include <cstring>
 #include "driver/ledc.h"
 
 #undef ESP_ERROR_CHECK
 #define ESP_ERROR_CHECK(x)   do { esp_err_t rc = (x); if (rc != ESP_OK) { ESP_LOGE("err", "esp_err_t = %d", rc); assert(0 && #x);} } while(0);
+
 #define SW_PIN (gpio_num_t)6
 #define ENA_PIN (gpio_num_t)4
 #define INB_PIN (gpio_num_t)5
@@ -52,7 +53,7 @@ void setup() {
     gpio_config(&io_conf);
 
     gpio_install_isr_service(0);
-    gpio_isr_handler_add(SW_PIN, buttonInterrupt, NULL);
+    gpio_isr_handler_add(SW_PIN, buttonInterrupt, nullptr);
 
     // Set ENA_PIN as intput and interupt on falling edge
     io_conf.intr_type = GPIO_INTR_NEGEDGE;
@@ -76,7 +77,7 @@ void setup() {
 extern "C" void app_main() {
     setup();
 
-    xTaskCreate(runController, "runController", 8192, NULL, 4, NULL);
+    xTaskCreate(runController, "runController", 8192, nullptr, 4, nullptr);
 
     // Here is the task for the coooking controller
     //xTaskCreate(printDirection, "cooker", 4096, NULL, 5, NULL);

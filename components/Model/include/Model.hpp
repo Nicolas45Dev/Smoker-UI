@@ -5,6 +5,7 @@
 #include "Config.h"
 #include <esp_log.h>
 #include <MAX31855.hpp>
+#include "MeatProfileData.h"
 #include <BME280.hpp>
 #include <stdio.h>
 #include <stdint.h>
@@ -25,39 +26,50 @@
 class Model
 {
 private:
+
     uint8_t page_index = 0;
     uint8_t page_option = 0;
+
     bool page_change = false;
+
+    float thermo_tank_set_temp = 0;
+    float thermo_meat1_set_temp = 0;
+    float thermo_meat2_set_temp = 0;
 
     BME280 bme280;
     MAX31855 thermo_tank;
     MAX31855 thermo_meat1;
     MAX31855 thermo_meat2;
 
-    float thermo_tank_set_temp = 0;
-    float thermo_meat1_set_temp = 0;
-    float thermo_meat2_set_temp = 0;
-
     TEMP_UNIT user_unit = DEFAULT_UNIT;
+
+    std::array<MeatProfileData, 10> meat_profile_data;
 
 public:
     Model();
     ~Model();
 
-    void readThermocouples(char* data, uint8_t sensor_index);
-    void readBME280(uint8_t sensor_index, char* data);
-    float getThermoTankSetTemp() { return thermo_tank_set_temp; }
-    void getThermoMeat1SetTemp(char* data);
-    void getThermoMeat2SetTemp(char* data);
-    float readThermocouples(uint8_t sensor_index);
-    void setThermoTankSetTemp(float temp) { thermo_tank_set_temp = temp; }
-    void setThermoMeat1SetTemp(float temp) { thermo_meat1_set_temp = temp; }
-    void setThermoMeat2SetTemp(float temp) { thermo_meat2_set_temp = temp; }
+    uint8_t getPageIndex() const { return page_index; }
+    uint8_t getPageOption() const { return page_option; }
 
+    void getThermoMeat1SetTemp(char* data) const;
+    void getThermoMeat2SetTemp(char* data) const;
+    void readBME280(const uint8_t sensor_index, char* data);
+    void readThermocouples(char* data, const uint8_t sensor_index);
     void setPageChange(bool change, int8_t option_change = 0);
-    uint8_t getPageIndex() { return page_index; }
-    uint8_t getPageOption() { return page_option; }
-    void setPageIndex(uint8_t index) { page_index = index; }
+    void setPageIndex(const uint8_t index) { page_index = index; }
+    void setThermoMeat1SetTemp(const float temp) { thermo_meat1_set_temp = temp; }
+    void setThermoMeat2SetTemp(const float temp) { thermo_meat2_set_temp = temp; }
+    void setThermoTankSetTemp(const float temp) { thermo_tank_set_temp = temp; }
+    void setUnit(const TEMP_UNIT unit) { user_unit = unit; }
+
+    float getThermoMeat1SetTemp() const { return thermo_meat1_set_temp; }
+    float getThermoMeat2SetTemp() const { return thermo_meat2_set_temp; }
+    float getThermoTankSetTemp() const { return thermo_tank_set_temp; }
+    float readThermocouples(uint8_t sensor_index);
+
+    std::array<MeatProfileData, 10> &getMeatProfile() { return meat_profile_data; }
+
 };
 
 #endif // MODEL_HPP

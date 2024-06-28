@@ -1,6 +1,6 @@
 #include "Controller.hpp"
 
-Controller::Controller(uint8_t update_interval) {
+Controller::Controller(const uint8_t update_interval) {
     view.initDisplay();
 
     memset(thermo_tank, 0, sizeof(thermo_tank));
@@ -12,9 +12,7 @@ Controller::Controller(uint8_t update_interval) {
     bme280_update_tick = start_tick;
 }
 
-Controller::~Controller() {
-
-}
+Controller::~Controller() = default;
 
 void Controller::run() {
     current_tick = xTaskGetTickCount();
@@ -31,17 +29,10 @@ void Controller::run() {
 
         model.getThermoMeat1SetTemp(thermo_meat1_set);
         model.getThermoMeat2SetTemp(thermo_meat2_set);
-        
-        float delta_temp1 = model.readThermocouples(0) - previous_thermo_1;
-        float delta_temp2 = model.readThermocouples(1) - previous_thermo_2;
 
-        float derived_temp_1 = delta_temp1 / (THERMOCOUPLE_UPDATE_INTERVAL / 1000);
-        float derived_temp_2 = delta_temp2 / (THERMOCOUPLE_UPDATE_INTERVAL / 1000);
+        computeRemainingTime();
 
         thermocouple_update_tick = current_tick;
-
-        previous_thermo_1 = model.readThermocouples(0);
-        previous_thermo_2 = model.readThermocouples(1);
     }
 
     if (current_tick - bme280_update_tick >= THERMOMETER_UPDATE_INTERVAL) {
@@ -51,6 +42,28 @@ void Controller::run() {
 
     // update view
     updateView();
+}
+
+void Controller::computeRemainingTime() {
+    const float temp1 = model.readThermocouples(0);
+    const float temp2 = model.readThermocouples(1);
+
+    const float delta_temp1 = temp1 - previous_thermo_1;
+    const float delta_temp2 = temp2 - previous_thermo_2;
+
+    const float derived_temp_1 = delta_temp1 / (THERMOCOUPLE_UPDATE_INTERVAL / 1000.0);
+    const float derived_temp_2 = delta_temp2 / (THERMOCOUPLE_UPDATE_INTERVAL / 1000.0);
+
+    if(derived_temp_1 != 0 && model.getThermoMeat1SetTemp() != 0) {
+        time_meat_1 = static_cast<uint32_t>((model.getThermoMeat1SetTemp() - temp1) / derived_temp_1);
+    }
+
+    if(derived_temp_2 != 0 && model.getThermoMeat2SetTemp() != 0) {
+        time_meat_2 = static_cast<uint32_t>((model.getThermoMeat2SetTemp() - temp2) / derived_temp_2);
+    }
+
+    previous_thermo_1 = temp1;
+    previous_thermo_2 = temp2;
 }
 
 void Controller::readModelData() {
@@ -80,7 +93,7 @@ void Controller::updateView() {
             break;
         case 3:
             page_option_max = PAGE_OPTION_COUNT[3];
-            view.drawMeatSelectionPage(option_change);
+            view.drawMeatSelectionPage(option_change, model.getMeatProfile());
             break;
         case 4:
             page_option_max = PAGE_OPTION_COUNT[4];
@@ -93,10 +106,6 @@ void Controller::updateView() {
         default:
             break;
     }
-}
-
-void Controller::updateModel() {
-    // update model
 }
 
 void Controller::setPageChange() {
@@ -135,6 +144,9 @@ void Controller::setMenuPageFromOption() {
     case 1:
         model.setPageIndex(4);
         break;
+    case 2:
+        model.setPageIndex(1);
+        break;
     default:
         model.setPageIndex(1);
         break;
@@ -149,16 +161,16 @@ void Controller::setMeatProfilePageFromOption() {
         break;
     default:
         // set meat profile
-        model.setThermoTankSetTemp(view.getMeatProfileData(option_change).tank_temp);
-        model.setThermoMeat1SetTemp(view.getMeatProfileData(option_change).meat_temp);
-        model.setThermoMeat2SetTemp(view.getMeatProfileData(option_change).meat_temp);
+        model.setThermoTankSetTemp(model.getMeatProfile()[option_change].tank_temp);
+        model.setThermoMeat1SetTemp(model.getMeatProfile()[option_change].meat_temp);
+        model.setThermoMeat2SetTemp(model.getMeatProfile()[option_change].meat_temp);
 
         model.setPageIndex(1);
         break;
     }
 }
 
-void Controller::setOptionChange(bool direction) {
+void Controller::setOptionChange(const bool direction) {
     if(current_tick > (previous_tick + 200)) {
         option_change += direction ? 1 : -1;
         option_change %= page_option_max;
@@ -169,7 +181,26 @@ void Controller::setOptionChange(bool direction) {
     previous_tick = current_tick;
 }
 
-void Controller::setPageParams(bool withOption) {
+void Controller::setSettingsPageFromOption() {
+    switch (option_change)
+    {
+    case 0:
+        // Units are in Celsius
+        model.setUnit(TEMP_UNIT::CELSIUS_UNIT);
+        model.setPageIndex(1);
+        break;
+    case 1:
+        // Units are in Fahrenheit
+        model.setUnit(TEMP_UNIT::FAHRENHEIT_UNIT);
+        model.setPageIndex(1);
+        break;
+    default:
+        model.setPageIndex(1);
+        break;
+    }
+}
+
+void Controller::setPageParams(const bool withOption) {
     page_params.temp_tank1 = thermo_tank;
     page_params.temp_meat1 = thermo_meat1;
     page_params.temp_meat2 = thermo_meat2;

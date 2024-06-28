@@ -24,15 +24,15 @@ The submodule is the library to control the ST7920 screen. The library is a fork
 The configuration for the system is keep at a high layer. The configuration is done in the `Config.h` file. The file is located in the `config` folder. The file is a simple header file that contains the configuration for the system. The configuration is done using the `#define` directive. The configuration is divided into two categories, the configuration for the hardware and the configuration for the software. The configuration for the hardware is the configuration for the pins that are used to connect the screen and the temperature sensors. The configuration for the software is the configuration for the BLE server and the cooking profiles.
 
 # Planning
-Here is a simple descript ion of all the features that the UI will have. The features are divided into two categories, the features that are already implemented and the features that are still in development. The features are show on the first level of the list. The specific requirements of the features are shown on the second level of the list. The features that are already implemented are marked with a check mark. The features that are still in development are marked with a box.
+Here is a simple description of all the features that the UI will have. The features are divided into two categories, the features that are already implemented and the features that are still in development. The features are show on the first level of the list. The specific requirements of the features are shown on the second level of the list. The features that are already implemented are marked with a check mark. The features that are still in development are marked with a box.
 
 Overall progress:
 
-![](https://geps.dev/progress/29)
+![](https://geps.dev/progress/46)
 
 On the ESP32: (37)
-- [ ] Monitor the temperature of the smoker
-  - [ ] Set the temperature of the smoker to reach and maintain 
+- [x] Monitor the temperature of the smoker
+  - [x] Set the temperature of the smoker to reach and maintain 
   - [x] Monitor the inside temperature of the smoker
 - [ ] Monitor the temperature of the meat
     - [x] Monitor at least two temperatures
@@ -55,9 +55,9 @@ On the ESP32: (37)
   - [ ] Control the speed of the fan 
 - [ ] Can control the smoker smoke generator
   - [ ] Control on and off 
-- [ ] Monitor the environment temperature
+- [x] Monitor the environment temperature
 - [ ] Monitor the environment humidity
-- [ ] Monitor the environment pressure
+- [x] Monitor the environment pressure
 - [ ] Have a simple UI to control the smoker
   - [x] Have a logo page
   - [x] Have a icon to monitor the smoker temperature

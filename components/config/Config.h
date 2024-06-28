@@ -23,6 +23,8 @@ typedef enum {
 #define CELSIUS_TO_KELVIN(x) (x + 273.15)
 #define FAHRENHEIT_TO_CELSIUS(x) ((x - 32) * 5 / 9)
 #define FAHRENHEIT_TO_KELVIN(x) ((x - 32) * 5 / 9 + 273.15)
+
+// define a macro for pressure conversion
 #define KELVIN_TO_CELSIUS(x) (x - 273.15)
 #define KELVIN_TO_FAHRENHEIT(x) ((x - 273.15) * 9 / 5 + 32)
 #define PASCAL_TO_HECTOPASCAL(x) (x / 100)

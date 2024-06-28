@@ -1,21 +1,8 @@
 #include "View.hpp"
 
-View::View() {
-    // Set the meat profile in alphabetical order
-    this->meat_profile_data[0] = {0, "Bacon", 65, 120};
-    this->meat_profile_data[1] = {1, "Beef", 55, 90};
-    this->meat_profile_data[2] = {2, "Chicken", 84, 120};
-    this->meat_profile_data[3] = {3, "Cold Smoke", -1, -1};
-    this->meat_profile_data[4] = {4, "Fish", 60, 120};
-    this->meat_profile_data[5] = {5, "General smoking", -1, 120};
-    this->meat_profile_data[6] = {6, "Pork high", 96, 120};
-    this->meat_profile_data[7] = {7, "Pork low", 74, 120};
-    this->meat_profile_data[8] = {8, "Custom 1", -1, -1};
-    this->meat_profile_data[9] = {9, "Custom 2", -1, -1};
-}
+View::View() = default;
 
-View::~View() {
-}
+View::~View() = default;
 
 void View::initDisplay() {
     u8g2_esp32_hal_t u8g2_esp32_hal = U8G2_ESP32_HAL_DEFAULT;
@@ -41,7 +28,7 @@ void View::drawLogoPage() {
     u8g2_SendBuffer(&u8g2);
 }
 
-void View::drawMainPage(page_params_t &page_params)
+void View::drawMainPage(const page_params_t &page_params)
 {
     char buffer_t1[10];
     char buffer_t2[10];
@@ -86,10 +73,16 @@ void View::drawMainPage(page_params_t &page_params)
             index = 0;
         }
 
+        char buffer_time1[8];
+        formatTime(page_params.time_meat1, buffer_time1);
+
+        char buffer_time2[8];
+        formatTime(page_params.time_meat2, buffer_time2);
+
         // String for time 1
-        u8g2_DrawStr(&u8g2, 92, 31, std::to_string(page_params.time_meat1).c_str());
+        u8g2_DrawStr(&u8g2, 92, 31, buffer_time1);
         // String for time 2
-        u8g2_DrawStr(&u8g2, 92, 55, std::to_string(page_params.time_meat2).c_str());
+        u8g2_DrawStr(&u8g2, 92, 55, buffer_time2);
     }
     else {
         u8g2_DrawBitmap(&u8g2, 82, 12, 1, 8, thermometer);
@@ -105,15 +98,21 @@ void View::drawMainPage(page_params_t &page_params)
     u8g2_SendBuffer(&u8g2);
 }
 
-void View::drawMenuPage(uint8_t selected_option) {
+void View::drawMenuPage(const uint8_t selected_option) {
     u8g2_ClearBuffer(&u8g2);
     setPageHeader("Menu");
 
-    u8g2_DrawButtonUTF8(&u8g2, 8, 20, button_style[selected_option == 0], 0, 2, 2, "Meat profile");
-    u8g2_DrawButtonUTF8(&u8g2, 8, 36, button_style[selected_option == 1], 0, 2, 2, "Settings");
+    if(selected_option < 2) {
+        u8g2_DrawButtonUTF8(&u8g2, 8, 20, button_style[selected_option == 0], 0, 2, 2, "Meat profile");
+        u8g2_DrawButtonUTF8(&u8g2, 8, 36, button_style[selected_option == 1], 0, 2, 2, "Settings");
+    }
+    else {
+        u8g2_DrawButtonUTF8(&u8g2, 8, 20, button_style[selected_option == 2], 0, 2, 2, "Settings");
+        u8g2_DrawButtonUTF8(&u8g2, 8, 36, button_style[selected_option == 3], 0, 2, 2, "Controls");
+    }
 
-    u8g2_DrawButtonUTF8(&u8g2, 8, 60, button_style[selected_option == 2], 0, 2, 2, "Save");
-    u8g2_DrawButtonUTF8(&u8g2, 90, 60, button_style[selected_option == 3], 0, 2, 2, "Exit");
+
+    u8g2_DrawButtonUTF8(&u8g2, 90, 60, button_style[selected_option == 4], 0, 2, 2, "Exit");
 
     u8g2_SendBuffer(&u8g2);
 }
@@ -123,15 +122,15 @@ void View::setPageHeader(const char *header) {
     u8g2_DrawStr(&u8g2, 32, 7, header);
 }
 
-void View::drawMeatSelectionPage(uint8_t selected_option) {
+void View::drawMeatSelectionPage(const uint8_t selected_option, const std::array<MeatProfileData, 10> &profile) {
     u8g2_ClearBuffer(&u8g2);
     setPageHeader("Meat profile");
 
     uint8_t index = (selected_option / 3) * 3;
 
     for (uint8_t i = 0; i < 3; i++) {
-        u8g2_DrawButtonUTF8(&u8g2, 8, 20 + (i * 16), button_style[selected_option == (i + index)], 0, 2, 2, meat_profile_data[i + index].name);
-        if(i + index > 9) {
+        u8g2_DrawButtonUTF8(&u8g2, 8, 20 + (i * 16), button_style[selected_option == (i + index)], 0, 2, 2, profile[i + index].name);
+        if(i + index > 8) {
             break;
         }
     }
@@ -141,7 +140,7 @@ void View::drawMeatSelectionPage(uint8_t selected_option) {
     u8g2_SendBuffer(&u8g2);
 }
 
-void View::drawSettingsPage(uint8_t selected_option) {
+void View::drawSettingsPage(const uint8_t selected_option) {
     u8g2_ClearBuffer(&u8g2);
     setPageHeader("Settings");
 
@@ -151,8 +150,7 @@ void View::drawSettingsPage(uint8_t selected_option) {
     // Purge the pellet burner
     u8g2_DrawButtonUTF8(&u8g2, 8, 36, button_style[selected_option == 1], 0, 2, 2, "Purge burner");
 
-    u8g2_DrawButtonUTF8(&u8g2, 8, 60, button_style[selected_option == 2], 0, 2, 2, "Save");
-    u8g2_DrawButtonUTF8(&u8g2, 90, 60, button_style[selected_option == 3], 0, 2, 2, "Exit");
+    u8g2_DrawButtonUTF8(&u8g2, 90, 60, button_style[selected_option == 2], 0, 2, 2, "Exit");
 
     u8g2_SendBuffer(&u8g2);
 }
@@ -161,4 +159,25 @@ void View::drawStandbyPage(uint8_t selected_option) {
     u8g2_ClearBuffer(&u8g2);
 
     u8g2_SendBuffer(&u8g2);
+}
+
+void View::drawTemperatureSettingsPage(const uint8_t selected_option) {
+    u8g2_ClearBuffer(&u8g2);
+    setPageHeader("Temperature unit");
+
+    u8g2_DrawButtonUTF8(&u8g2, 8, 20, button_style[selected_option == 0], 0, 2, 2, "Celsius");
+    u8g2_DrawButtonUTF8(&u8g2, 8, 36, button_style[selected_option == 1], 0, 2, 2, "Fahrenheit");
+
+    u8g2_DrawButtonUTF8(&u8g2, 8, 60, button_style[selected_option == 2], 0, 2, 2, "Save");
+    u8g2_DrawButtonUTF8(&u8g2, 90, 60, button_style[selected_option == 3], 0, 2, 2, "Exit");
+
+    u8g2_SendBuffer(&u8g2);
+}
+
+void View::formatTime(const uint32_t time, char* buffer) {
+    // Format the time to hours and minutes
+    uint8_t hours = time / 60;
+    uint8_t minutes = time % 60;
+
+    sprintf(buffer, "%02d:%02d", hours, minutes);
 }
