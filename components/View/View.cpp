@@ -77,7 +77,7 @@ void View::drawMainPage(page_params_t &page_params)
             // String for temperature 2
             u8g2_DrawStr(&u8g2, 92, 43, page_params.temp_meat2);
         }
-        else if (index >= 60 && index < 120) {
+        else if (index >= 80 && index < 120) {
             // String for time 1
             u8g2_DrawStr(&u8g2, 92, 19, page_params.set_temp_meat1);
             // String for time 2

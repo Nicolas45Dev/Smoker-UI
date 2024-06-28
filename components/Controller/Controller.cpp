@@ -31,17 +31,6 @@ void Controller::run() {
 
         model.getThermoMeat1SetTemp(thermo_meat1_set);
         model.getThermoMeat2SetTemp(thermo_meat2_set);
-        
-        float delta_temp1 = model.readThermocouples(0) - previous_thermo_1;
-        float delta_temp2 = model.readThermocouples(1) - previous_thermo_2;
-
-        float derived_temp_1 = delta_temp1 / (THERMOCOUPLE_UPDATE_INTERVAL / 1000);
-        float derived_temp_2 = delta_temp2 / (THERMOCOUPLE_UPDATE_INTERVAL / 1000);
-
-        thermocouple_update_tick = current_tick;
-
-        previous_thermo_1 = model.readThermocouples(0);
-        previous_thermo_2 = model.readThermocouples(1);
     }
 
     if (current_tick - bme280_update_tick >= THERMOMETER_UPDATE_INTERVAL) {

@@ -27,6 +27,7 @@ class Model
 private:
     uint8_t page_index = 0;
     uint8_t page_option = 0;
+    
     bool page_change = false;
 
     BME280 bme280;

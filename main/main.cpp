@@ -1,4 +1,5 @@
 #include "Controller.hpp"
+#include "Cooker.hpp"
 #include <driver/gpio.h>
 #include <esp_log.h>
 #include <freertos/FreeRTOS.h>
@@ -14,6 +15,7 @@
 #define INB_PIN (gpio_num_t)5
 
 Controller controller(100);
+Cooker cooker;
 
 bool option_change = false;
 
@@ -31,9 +33,16 @@ void IRAM_ATTR buttonInterrupt(void *arg) {
 }
 
 void runController(void *pvParameter) {
-    while(1) {
+    for(;;) {
         controller.run();
         vTaskDelay(100 / portTICK_PERIOD_MS);
+    }
+}
+
+void runCooker(void *pvParameter) {
+    for(;;) {
+        cooker.cooker_work();
+        vTaskDelay(500 / portTICK_PERIOD_MS);
     }
 }
 
@@ -76,8 +85,8 @@ void setup() {
 extern "C" void app_main() {
     setup();
 
-    xTaskCreate(runController, "runController", 8192, NULL, 4, NULL);
+    xTaskCreate(runController, "runController", 8192, NULL, 5, NULL);
 
     // Here is the task for the coooking controller
-    //xTaskCreate(printDirection, "cooker", 4096, NULL, 5, NULL);
+    xTaskCreate(runCooker, "cooker", 4096, NULL, 6, NULL);
 }
