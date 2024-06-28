@@ -4,6 +4,9 @@
 #include <array>
 #include "Config.h"
 #include <esp_log.h>
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "freertos/semphr.h"
 #include <MAX31855.hpp>
 #include <BME280.hpp>
 #include <stdio.h>
@@ -27,7 +30,7 @@ class Model
 private:
     uint8_t page_index = 0;
     uint8_t page_option = 0;
-    
+
     bool page_change = false;
 
     BME280 bme280;
@@ -41,9 +44,18 @@ private:
 
     TEMP_UNIT user_unit = DEFAULT_UNIT;
 
-public:
+    SemaphoreHandle_t _mutex = NULL;
+    static Model* _instance;
+
+protected:
     Model();
     ~Model();
+
+public:
+    Model(Model const&) = delete;
+    void operator=(Model const&) = delete;
+
+    static Model* getInstance();
 
     void readThermocouples(char* data, uint8_t sensor_index);
     void readBME280(uint8_t sensor_index, char* data);

@@ -2,6 +2,7 @@
 
 Controller::Controller(uint8_t update_interval) {
     view.initDisplay();
+    model = Model::getInstance();
 
     memset(thermo_tank, 0, sizeof(thermo_tank));
     memset(thermo_meat1, 0, sizeof(thermo_meat1));
@@ -21,16 +22,16 @@ void Controller::run() {
 
     if(current_tick - start_tick >= 2000 && starting) {
         starting = false;
-        model.setPageIndex(1);
+        model->setPageIndex(1);
     }
 
     if (current_tick - thermocouple_update_tick >= THERMOCOUPLE_UPDATE_INTERVAL) {
-        model.readThermocouples(thermo_tank, 0);
-        model.readThermocouples(thermo_meat1, 1);
-        model.readThermocouples(thermo_meat2, 2);
+        model->readThermocouples(thermo_tank, 0);
+        model->readThermocouples(thermo_meat1, 1);
+        model->readThermocouples(thermo_meat2, 2);
 
-        model.getThermoMeat1SetTemp(thermo_meat1_set);
-        model.getThermoMeat2SetTemp(thermo_meat2_set);
+        model->getThermoMeat1SetTemp(thermo_meat1_set);
+        model->getThermoMeat2SetTemp(thermo_meat2_set);
     }
 
     if (current_tick - bme280_update_tick >= THERMOMETER_UPDATE_INTERVAL) {
@@ -44,17 +45,17 @@ void Controller::run() {
 
 void Controller::readModelData() {
     // read all sensors
-    model.readBME280(0, bme280_data_str_temp);
-    model.readBME280(2, bme280_data_str_hum);
+    model->readBME280(0, bme280_data_str_temp);
+    model->readBME280(2, bme280_data_str_hum);
 }
 
 void Controller::updateView() {
 
-    setPageParams(model.getPageIndex() >= 1);
+    setPageParams(model->getPageIndex() >= 1);
     if(!is_active) {
-        model.setPageIndex(5);
+        model->setPageIndex(5);
     }
-    switch (model.getPageIndex())
+    switch (model->getPageIndex())
     {
         case 0:
             view.drawLogoPage();
@@ -90,13 +91,13 @@ void Controller::updateModel() {
 
 void Controller::setPageChange() {
     if(current_tick > (previous_tick + 200)) {
-        switch (model.getPageIndex())
+        switch (model->getPageIndex())
         {
         case 0:
-            model.setPageIndex(1);
+            model->setPageIndex(1);
             break;
         case 1:
-            model.setPageIndex(2);
+            model->setPageIndex(2);
             break;
         case 2:
             setMenuPageFromOption();
@@ -105,7 +106,7 @@ void Controller::setPageChange() {
             setMeatProfilePageFromOption();
             break;
         default:
-            model.setPageIndex(1);
+            model->setPageIndex(1);
             break;
         }
 
@@ -119,13 +120,13 @@ void Controller::setMenuPageFromOption() {
     switch (option_change)
     {
     case 0:
-        model.setPageIndex(3);
+        model->setPageIndex(3);
         break;
     case 1:
-        model.setPageIndex(4);
+        model->setPageIndex(4);
         break;
     default:
-        model.setPageIndex(1);
+        model->setPageIndex(1);
         break;
     }
 }
@@ -134,15 +135,15 @@ void Controller::setMeatProfilePageFromOption() {
     switch (option_change)
     {
     case 10:
-        model.setPageIndex(2);
+        model->setPageIndex(2);
         break;
     default:
         // set meat profile
-        model.setThermoTankSetTemp(view.getMeatProfileData(option_change).tank_temp);
-        model.setThermoMeat1SetTemp(view.getMeatProfileData(option_change).meat_temp);
-        model.setThermoMeat2SetTemp(view.getMeatProfileData(option_change).meat_temp);
+        model->setThermoTankSetTemp(view.getMeatProfileData(option_change).tank_temp);
+        model->setThermoMeat1SetTemp(view.getMeatProfileData(option_change).meat_temp);
+        model->setThermoMeat2SetTemp(view.getMeatProfileData(option_change).meat_temp);
 
-        model.setPageIndex(1);
+        model->setPageIndex(1);
         break;
     }
 }
@@ -162,7 +163,7 @@ void Controller::setPageParams(bool withOption) {
     page_params.temp_tank1 = thermo_tank;
     page_params.temp_meat1 = thermo_meat1;
     page_params.temp_meat2 = thermo_meat2;
-    page_params.set_temp_tank = model.getThermoTankSetTemp();
+    page_params.set_temp_tank = model->getThermoTankSetTemp();
     page_params.set_temp_meat1 = thermo_meat1_set;
     page_params.set_temp_meat2 = thermo_meat2_set;
     page_params.time_meat1 = time_meat_1;

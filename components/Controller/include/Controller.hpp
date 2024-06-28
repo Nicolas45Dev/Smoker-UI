@@ -54,7 +54,7 @@ private:
     float previous_thermo_2;
 
     View view;
-    Model model;
+    Model* model;
     page_params_t page_params;
 
     void readModelData();

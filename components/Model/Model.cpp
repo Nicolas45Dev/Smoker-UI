@@ -7,6 +7,14 @@ Model::Model() : thermo_tank(MAX31855(THERMO_TANK_CS, THERMO_TANK_ACTIVE_LED)), 
 Model::~Model() {
 }
 
+// TODO: Fix undeifned reference to Model::getInstance()
+Model* Model::getInstance() {
+    if(_instance == NULL) {
+        _instance = new Model();
+    }
+    return _instance;
+}
+
 void Model::readThermocouples(char* data, uint8_t sensor_index) {
     float temp = 0;
     switch (sensor_index) {
