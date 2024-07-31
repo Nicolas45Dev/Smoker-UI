@@ -10,7 +10,7 @@ Controller::Controller(uint8_t update_interval) {
 
     start_tick = xTaskGetTickCount();
     thermocouple_update_tick = start_tick;
-    bme280_update_tick = start_tick;
+    cooker_update_tick = start_tick;
 }
 
 Controller::~Controller() {
@@ -23,34 +23,24 @@ void Controller::run() {
     if(current_tick - start_tick >= 2000 && starting) {
         starting = false;
         model->setPageIndex(1);
+
+        readThermocouples();
     }
 
     if (current_tick - thermocouple_update_tick >= THERMOCOUPLE_UPDATE_INTERVAL) {
-        model->readThermocouples(thermo_tank, 0);
-        model->readThermocouples(thermo_meat1, 1);
-        model->readThermocouples(thermo_meat2, 2);
-
-        model->getThermoMeat1SetTemp(thermo_meat1_set);
-        model->getThermoMeat2SetTemp(thermo_meat2_set);
+        readThermocouples();
     }
 
-    if (current_tick - bme280_update_tick >= THERMOMETER_UPDATE_INTERVAL) {
-        readModelData();
-        bme280_update_tick = current_tick;
+    if(current_tick - cooker_update_tick >= COOKER_INTERVAL) {
+        cooker_update_tick = current_tick;
+        cooker.cooker_work();
     }
 
     // update view
     updateView();
 }
 
-void Controller::readModelData() {
-    // read all sensors
-    model->readBME280(0, bme280_data_str_temp);
-    model->readBME280(2, bme280_data_str_hum);
-}
-
 void Controller::updateView() {
-
     setPageParams(model->getPageIndex() >= 1);
     if(!is_active) {
         model->setPageIndex(5);
@@ -144,6 +134,10 @@ void Controller::setMeatProfilePageFromOption() {
         model->setThermoMeat2SetTemp(view.getMeatProfileData(option_change).meat_temp);
 
         model->setPageIndex(1);
+
+        cooker.set_active(true);
+        cooker.set_target_temp(view.getMeatProfileData(option_change).tank_temp);
+
         break;
     }
 }
@@ -168,7 +162,14 @@ void Controller::setPageParams(bool withOption) {
     page_params.set_temp_meat2 = thermo_meat2_set;
     page_params.time_meat1 = time_meat_1;
     page_params.time_meat2 = time_meat_2;
-    page_params.bme280_data_temp = bme280_data_str_temp;
-    page_params.bme280_data_hum = bme280_data_str_hum;
     page_params.selected_option = withOption ? option_change : 0;
+}
+
+void Controller::readThermocouples() {
+    model->readThermocouples(thermo_tank, 0);
+    model->readThermocouples(thermo_meat1, 1);
+    model->readThermocouples(thermo_meat2, 2);
+
+    model->getThermoMeat1SetTemp(thermo_meat1_set);
+    model->getThermoMeat2SetTemp(thermo_meat2_set);
 }

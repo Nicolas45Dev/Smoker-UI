@@ -1,5 +1,4 @@
 #include "Controller.hpp"
-#include "Cooker.hpp"
 #include <driver/gpio.h>
 #include <esp_log.h>
 #include <freertos/FreeRTOS.h>
@@ -15,34 +14,34 @@
 #define INB_PIN (gpio_num_t)5
 
 Controller controller(100);
-Cooker cooker;
 
 bool option_change = false;
 
-void IRAM_ATTR rotaryEncoderInterrupt(void *arg) {
-    // if ENB_PIN is high, then the direction is clockwise
-    if(gpio_get_level(INB_PIN)) {
-        controller.setOptionChange(true);
-    } else {
-        controller.setOptionChange(false);
+void rotary_encoder_reading() {
+    bool ena = gpio_get_level(ENA_PIN);
+    bool inb = gpio_get_level(INB_PIN);
+
+    if(ena == 0 && inb == 1) {
+        controller.setOptionChange(1);
+    } else if(ena == 1 && inb == 0) {
+        controller.setOptionChange(-1);
     }
 }
 
-void IRAM_ATTR buttonInterrupt(void *arg) {
-    controller.setPageChange();
+void read_button(void *pvParameter) {
+    for(;;) {
+        if(gpio_get_level(SW_PIN) == 0) {
+            controller.setPageChange();
+        }
+        rotary_encoder_reading();
+        vTaskDelay(10 / portTICK_PERIOD_MS);
+    }
 }
 
 void runController(void *pvParameter) {
     for(;;) {
         controller.run();
         vTaskDelay(100 / portTICK_PERIOD_MS);
-    }
-}
-
-void runCooker(void *pvParameter) {
-    for(;;) {
-        cooker.cooker_work();
-        vTaskDelay(500 / portTICK_PERIOD_MS);
     }
 }
 
@@ -60,8 +59,8 @@ void setup() {
     io_conf.pull_up_en = GPIO_PULLUP_ENABLE;
     gpio_config(&io_conf);
 
-    gpio_install_isr_service(0);
-    gpio_isr_handler_add(SW_PIN, buttonInterrupt, NULL);
+    // gpio_install_isr_service(0);
+    // gpio_isr_handler_add(SW_PIN, buttonInterrupt, NULL);
 
     // Set ENA_PIN as intput and interupt on falling edge
     io_conf.intr_type = GPIO_INTR_NEGEDGE;
@@ -79,14 +78,15 @@ void setup() {
     io_conf.pull_up_en = GPIO_PULLUP_ENABLE;
     gpio_config(&io_conf);
 
-    gpio_isr_handler_add(ENA_PIN, rotaryEncoderInterrupt, NULL);
+    // gpio_isr_handler_add(ENA_PIN, rotaryEncoderInterrupt, NULL);
 }
 
 extern "C" void app_main() {
     setup();
 
-    xTaskCreate(runController, "runController", 8192, NULL, 5, NULL);
+    xTaskCreate(read_button, "read_button", 2048, NULL, 4, NULL);
 
-    // Here is the task for the coooking controller
-    xTaskCreate(runCooker, "cooker", 4096, NULL, 6, NULL);
+    // xTaskCreate(rotary_encoder_reading, "rotary_encoder_reading", 1000, NULL, 5, NULL);
+
+    xTaskCreate(runController, "runController", 10000, NULL, 5, NULL);
 }

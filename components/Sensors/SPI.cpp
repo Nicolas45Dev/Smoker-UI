@@ -50,7 +50,7 @@ void SPI::write(uint8_t* data, size_t len, gpio_num_t pin_cs) {
 
     // Pull the CS pin low to start the transaction
     gpio_set_level(pin_cs, 0);
-    esp_err_t ret = spi_device_transmit(this->m_spi, &this->m_transaction);
+    esp_err_t ret = spi_device_polling_transmit(this->m_spi, &this->m_transaction);
     // Pull the CS pin high to end the transaction
     gpio_set_level(pin_cs, 1);
 }
@@ -63,7 +63,7 @@ void SPI::read(uint8_t* data, size_t len, gpio_num_t pin_cs) {
 
     // Pull the CS pin low to start the transaction
     gpio_set_level(pin_cs, 0);
-    esp_err_t ret = spi_device_transmit(this->m_spi, &this->m_transaction);
+    esp_err_t ret = spi_device_polling_transmit(this->m_spi, &this->m_transaction);
     // Pull the CS pin high to end the transaction
     gpio_set_level(pin_cs, 1);
 }

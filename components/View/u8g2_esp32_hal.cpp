@@ -66,6 +66,7 @@ uint8_t u8g2_esp32_spi_byte_cb(u8x8_t* u8x8,
       bus_config.miso_io_num = GPIO_NUM_NC;                  // MISO
       bus_config.quadwp_io_num = GPIO_NUM_NC;                // Not used
       bus_config.quadhd_io_num = GPIO_NUM_NC;                // Not used
+      bus_config.max_transfer_sz = 0;                       // Default
       // Check if the SPI host is already initialized
       // ESP_LOGI(TAG, "... Initializing bus.");
       ESP_ERROR_CHECK(spi_bus_initialize(HOST, &bus_config, 0));
@@ -102,7 +103,7 @@ uint8_t u8g2_esp32_spi_byte_cb(u8x8_t* u8x8,
       trans_desc.rx_buffer = NULL;
 
       // ESP_LOGI(TAG, "... Transmitting %d bytes.", arg_int);
-      ESP_ERROR_CHECK(spi_device_transmit(handle_spi, &trans_desc));
+      ESP_ERROR_CHECK(spi_device_polling_transmit(handle_spi, &trans_desc));
       break;
     }
   }

@@ -2,13 +2,30 @@
 #define COOKER_HPP
 
 #include <driver/gpio.h>
+#include "driver/ledc.h"
 #include <esp_log.h>
-#include <Model.hpp>
 #include <stdio.h>
 #include <stdint.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
-#include "freertos/semphr.h"
+
+#define ENL0_PIN (gpio_num_t)35
+#define ENL1_PIN (gpio_num_t)39
+#define DIRECT_PIN (gpio_num_t)11
+
+
+#define LEDC_TIMER              LEDC_TIMER_0
+#define LEDC_MODE               LEDC_LOW_SPEED_MODE
+#define LEDC_OUTPUT_IO          (12) // Define the output GPIO
+#define LEDC_CHANNEL            LEDC_CHANNEL_0
+#define LEDC_DUTY_RES           LEDC_TIMER_12_BIT // Set duty resolution to 12 bits
+#define LEDC_DUTY               (4096) // Set duty to 100%. (2 ** 12) * 100% = 4096
+#define LEDC_FREQUENCY          (12000) // Frequency in Hertz. Set frequency at 4 kHz
+
+#define MOTOR_TIMEOUT 2000
+#define HEATING_TIMEOUT 240000
+#define MOTOR_OPEN_TIMEOUT 1000
+#define MOTOR_CLOSE_TIMEOUT 300000
 
 typedef enum {
     STANDBY,
@@ -26,9 +43,12 @@ private:
     bool _is_active = false;
 
     float _thermo_tank;
+    float _target_temp;
     float _outside_temp;
     float _humidity;
     float _pressure;
+
+    uint32_t _previous_tick_motor = 0;
 
     COOKER_STATE _state = STANDBY;
 
@@ -64,6 +84,8 @@ private:
      */
     void state_control();
 
+    void init_pwm();
+
 public:
     Cooker(const uint16_t interval = 500);
     ~Cooker();
@@ -73,6 +95,10 @@ public:
      * 
      */
     void cooker_work();
+
+    void set_active(bool active);
+    void set_target_temp(float temp);
+
 };
 
 #endif

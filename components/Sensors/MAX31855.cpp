@@ -56,6 +56,8 @@ float MAX31855::readTemperature(TEMP_UNIT unit) {
 
     uint32_t data32 = (rx_buffer[0] << 24) | (rx_buffer[1] << 16) | (rx_buffer[2] << 8) | rx_buffer[3];
 
+    ESP_LOGI("MAX31855", "Data: %lu", data32);
+
     temperature_probe = (float)(data32 >> 18) * 0.25;
 
     temperature[avg_index] = temperature_probe;

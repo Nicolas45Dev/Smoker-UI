@@ -1,5 +1,7 @@
 #include "Model.hpp"
 
+Model* Model::_instance = NULL;
+
 Model::Model() : thermo_tank(MAX31855(THERMO_TANK_CS, THERMO_TANK_ACTIVE_LED)), thermo_meat1(MAX31855(THERMO_MEAT1_CS, THERMO_MEAT1_ACTIVE_LED)), thermo_meat2(MAX31855(THERMO_MEAT2_CS, THERMO_MEAT2_ACTIVE_LED))
 {
 }

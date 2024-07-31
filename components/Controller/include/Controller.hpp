@@ -1,6 +1,7 @@
 #ifndef CONTROLLER_HPP
 #define CONTROLLER_HPP
 
+#include "Cooker.hpp"
 #include <driver/gpio.h>
 #include <esp_log.h>
 #include <Model.hpp>
@@ -11,9 +12,8 @@
 #include <MAX31855.hpp>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
-#include "freertos/semphr.h"
 
-#define THERMOMETER_UPDATE_INTERVAL 10000
+#define COOKER_INTERVAL 500
 #define THERMOCOUPLE_UPDATE_INTERVAL 5000
 #define INACTIVE_TIMEOUT 20000
 #define PAGE_COUNT 5
@@ -23,7 +23,7 @@ const uint8_t PAGE_OPTION_COUNT[PAGE_COUNT] = {0, 2, 4, 12, 5};
 class Controller
 {
 private:
-    uint32_t bme280_update_tick = 0;
+    uint32_t cooker_update_tick = 0;
     uint32_t thermocouple_update_tick = 0;
     uint32_t time_tick = 0;
 
@@ -47,22 +47,21 @@ private:
     char thermo_meat2[8];
     char thermo_meat1_set[8];
     char thermo_meat2_set[8];
-    char bme280_data_str_temp[8];
-    char bme280_data_str_hum[8];
     
     float previous_thermo_1;
     float previous_thermo_2;
 
     View view;
     Model* model;
+    Cooker cooker;
     page_params_t page_params;
 
-    void readModelData();
     void updateView();
     void updateModel();
     void setPageParams(bool withOption);
     void setMenuPageFromOption();
     void setMeatProfilePageFromOption();
+    void readThermocouples();
 
 public:
     Controller(uint8_t update_interval);
