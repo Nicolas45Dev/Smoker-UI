@@ -33,6 +33,8 @@ private:
 
     bool is_active = true;
     bool starting = true;
+    bool m_is_init = false;
+
     int8_t option_change = 0;
 
     uint32_t previous_tick = 0;
@@ -68,6 +70,8 @@ public:
     ~Controller();
 
     void run();
+    bool init();
+    bool is_init() { return m_is_init; }
     void setPageChange();
     void setOptionChange(bool direction);
 };

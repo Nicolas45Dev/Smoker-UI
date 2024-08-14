@@ -17,7 +17,7 @@ void Cooker::state_starting()
     // Turn on the motor for a few seconds
     if(xTaskGetTickCount() - _previous_tick_motor < MOTOR_TIMEOUT) {
         gpio_set_level(DIRECT_PIN, 1);
-        ledc_set_duty(LEDC_MODE, LEDC_CHANNEL, 1800);
+        ledc_set_duty(LEDC_MODE, LEDC_CHANNEL, 4000);
         ledc_update_duty(LEDC_MODE, LEDC_CHANNEL);
     }
     else {
@@ -36,6 +36,8 @@ void Cooker::state_active()
     // Open the motor for 1 second every 5 minutes
     if(xTaskGetTickCount() - _previous_tick_motor > MOTOR_OPEN_TIMEOUT) {
         gpio_set_level(DIRECT_PIN, 1);
+        ledc_set_duty(LEDC_MODE, LEDC_CHANNEL, 4000);
+        ledc_update_duty(LEDC_MODE, LEDC_CHANNEL);
         _previous_tick_motor = xTaskGetTickCount();
     }
     else if(xTaskGetTickCount() - _previous_tick_motor > MOTOR_CLOSE_TIMEOUT) {

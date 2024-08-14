@@ -1,6 +1,14 @@
 #include "Controller.hpp"
 
 Controller::Controller(uint8_t update_interval) {
+
+}
+
+Controller::~Controller() {
+
+}
+
+bool Controller::init() {
     view.initDisplay();
     model = Model::getInstance();
 
@@ -11,10 +19,10 @@ Controller::Controller(uint8_t update_interval) {
     start_tick = xTaskGetTickCount();
     thermocouple_update_tick = start_tick;
     cooker_update_tick = start_tick;
-}
 
-Controller::~Controller() {
+    m_is_init = !m_is_init;
 
+    return m_is_init;
 }
 
 void Controller::run() {

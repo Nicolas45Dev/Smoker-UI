@@ -13,32 +13,27 @@
 #define ENA_PIN (gpio_num_t)4
 #define INB_PIN (gpio_num_t)5
 
-Controller controller(100);
+Controller controller;
 
 bool option_change = false;
 
-void rotary_encoder_reading() {
-    bool ena = gpio_get_level(ENA_PIN);
-    bool inb = gpio_get_level(INB_PIN);
-
-    if(ena == 0 && inb == 1) {
-        controller.setOptionChange(1);
-    } else if(ena == 1 && inb == 0) {
-        controller.setOptionChange(-1);
+void IRAM_ATTR rotaryEncoderInterrupt(void *arg) {
+    // if ENB_PIN is high, then the direction is clockwise
+    if(gpio_get_level(INB_PIN)) {
+        controller.setOptionChange(true);
+    } else {
+        controller.setOptionChange(false);
     }
 }
 
-void read_button(void *pvParameter) {
-    for(;;) {
-        if(gpio_get_level(SW_PIN) == 0) {
-            controller.setPageChange();
-        }
-        rotary_encoder_reading();
-        vTaskDelay(10 / portTICK_PERIOD_MS);
-    }
+void IRAM_ATTR buttonInterrupt(void *arg) {
+    controller.setPageChange();
 }
 
 void runController(void *pvParameter) {
+    if(!controller.is_init()) {
+        controller.init();
+    }
     for(;;) {
         controller.run();
         vTaskDelay(100 / portTICK_PERIOD_MS);
@@ -59,8 +54,8 @@ void setup() {
     io_conf.pull_up_en = GPIO_PULLUP_ENABLE;
     gpio_config(&io_conf);
 
-    // gpio_install_isr_service(0);
-    // gpio_isr_handler_add(SW_PIN, buttonInterrupt, NULL);
+    gpio_install_isr_service(0);
+    gpio_isr_handler_add(SW_PIN, buttonInterrupt, NULL);
 
     // Set ENA_PIN as intput and interupt on falling edge
     io_conf.intr_type = GPIO_INTR_NEGEDGE;
@@ -78,15 +73,11 @@ void setup() {
     io_conf.pull_up_en = GPIO_PULLUP_ENABLE;
     gpio_config(&io_conf);
 
-    // gpio_isr_handler_add(ENA_PIN, rotaryEncoderInterrupt, NULL);
+    gpio_isr_handler_add(ENA_PIN, rotaryEncoderInterrupt, NULL);
 }
 
 extern "C" void app_main() {
     setup();
-
-    xTaskCreate(read_button, "read_button", 2048, NULL, 4, NULL);
-
-    // xTaskCreate(rotary_encoder_reading, "rotary_encoder_reading", 1000, NULL, 5, NULL);
 
     xTaskCreate(runController, "runController", 10000, NULL, 5, NULL);
 }

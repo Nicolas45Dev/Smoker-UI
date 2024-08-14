@@ -22,10 +22,10 @@
 #define LEDC_DUTY               (4096) // Set duty to 100%. (2 ** 12) * 100% = 4096
 #define LEDC_FREQUENCY          (12000) // Frequency in Hertz. Set frequency at 4 kHz
 
-#define MOTOR_TIMEOUT 2000
+#define MOTOR_TIMEOUT 10000
 #define HEATING_TIMEOUT 240000
 #define MOTOR_OPEN_TIMEOUT 1000
-#define MOTOR_CLOSE_TIMEOUT 300000
+#define MOTOR_CLOSE_TIMEOUT 600000
 
 typedef enum {
     STANDBY,
