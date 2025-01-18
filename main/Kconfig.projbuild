@@ -1,0 +1,116 @@
+menu "Smoker configuration"
+
+    menu "Settings for tank"
+        config TANK_SIZE
+            int "Tank size"
+            range 1 60
+            default 40
+            help
+                The size of the tank in gallons.
+    endmenu
+
+    menu "Setting for sensors"
+        choice
+            prompt "Type of sensor"
+            default SENSOR_TYPE_THERMOCOUPLE
+            help
+                Select the type of sensor to use.
+
+            config SENSOR_TYPE_THERMOCOUPLE
+                bool "Thermocouple"
+                help
+                    Use a thermocouple sensor.
+
+            config SENSOR_TYPE_THERMISTOR
+                bool "Thermistor"
+                help
+                    Use a thermistor sensor.
+        endchoice
+
+        config THERMOCOUPLE_SPI_CLK
+            depends on SENSOR_TYPE_THERMOCOUPLE
+            int "SPI clock frequency"
+            default 5000000
+            help
+                The SPI clock frequency in Hz.
+
+        config THERMOCOUPLE_SPI_CS
+            depends on SENSOR_TYPE_THERMOCOUPLE
+            int "SPI chip select"
+            default 0
+            help
+                The SPI chip select to use.
+
+        config THERMISTOR_ADC_CHANNEL
+            depends on SENSOR_TYPE_THERMISTOR
+            int "ADC channel"
+            default 0
+            help
+                The ADC channel to use.
+
+        config THERMISTOR_R0
+            depends on SENSOR_TYPE_THERMISTOR
+            int "Thermistor resistance at 25C"
+            default 10000
+            help
+                The resistance of the thermistor at 25C.
+
+        config THERMISTOR_BETA
+            depends on SENSOR_TYPE_THERMISTOR
+            int "Thermistor beta value"
+            default 3950
+            help
+                The beta value of the thermistor.
+    endmenu
+
+    menu "Settings for heater"
+        config HEATER_PIN
+            int "Heater pin"
+            default 39
+            help
+                The pin to use for the heater.
+    endmenu
+
+    menu "Smoke pump"
+        config SMOKE_PUMP_PIN
+            int "Smoke pump pin"
+            default 35
+            help
+                The pin to use for the smoke pump.
+    endmenu
+
+    menu "Settings for motor"
+        config MOTOR_PIN_DIRECTION
+            int "Motor pin"
+            default 11
+            help
+                The pin to use for the motor.
+        
+        config MOTOR_PIN_PWM
+            int "Motor PWM pin"
+            default 12
+            help
+                The pin to use for the motor PWM.
+    endmenu
+
+    menu "Setting for inputs"
+        config ROTARY_ENCODER_PIN_A
+            int "Input pin"
+            default 4
+            help
+                The pin to use for the rotary encoder A.
+        
+        config ROTARY_ENCODER_PIN_B
+            int "Input pin"
+            default 5
+            help
+                The pin to use for the rotary encoder B.
+
+        config ROTARY_ENCODER_PIN_BUTTON
+            int "Input pin"
+            default 6
+            help
+                The pin to use for the rotary encoder button.
+    endmenu
+
+endmenu

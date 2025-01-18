@@ -17,6 +17,7 @@ typedef enum {
 #define DEFAULT_UNIT CELSIUS_UNIT
 #define DEFAULT_PRESSURE_UNIT HPA_UNIT
 #define TANK_SIZE 40
+#define EPSILON 0.0001
 
 // define a macro for temperature conversion
 #define CELSIUS_TO_FAHRENHEIT(x) (x * 9 / 5 + 32)

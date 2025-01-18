@@ -23,8 +23,8 @@ typedef struct {
     float set_temp_tank;
     char* set_temp_meat1;
     char* set_temp_meat2;
-    uint32_t time_meat1;
-    uint32_t time_meat2;
+    char* time_meat1;
+    char* time_meat2;
     char* bme280_data_temp;
     char* bme280_data_hum;
     uint8_t selected_option;

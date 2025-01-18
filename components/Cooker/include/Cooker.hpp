@@ -1,26 +1,29 @@
 #ifndef COOKER_HPP
 #define COOKER_HPP
 
+// Include the configuration file from the Kconfig
+#include "sdkconfig.h"
 #include <driver/gpio.h>
 #include "driver/ledc.h"
 #include <esp_log.h>
 #include <stdio.h>
 #include <stdint.h>
+#include <cstring>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
-#define ENL0_PIN (gpio_num_t)35
-#define ENL1_PIN (gpio_num_t)39
-#define DIRECT_PIN (gpio_num_t)11
+#define ENL0_PIN (gpio_num_t)CONFIG_SMOKE_PUMP_PIN
+#define ENL1_PIN (gpio_num_t)CONFIG_HEATER_PIN
+#define DIRECT_PIN (gpio_num_t)CONFIG_MOTOR_PIN_DIRECTION
 
 
-#define LEDC_TIMER              LEDC_TIMER_0
+#define LEDC_TIMER              LEDC_TIMER_1
 #define LEDC_MODE               LEDC_LOW_SPEED_MODE
-#define LEDC_OUTPUT_IO          (12) // Define the output GPIO
-#define LEDC_CHANNEL            LEDC_CHANNEL_0
-#define LEDC_DUTY_RES           LEDC_TIMER_12_BIT // Set duty resolution to 12 bits
-#define LEDC_DUTY               (4096) // Set duty to 100%. (2 ** 12) * 100% = 4096
-#define LEDC_FREQUENCY          (12000) // Frequency in Hertz. Set frequency at 4 kHz
+#define LEDC_OUTPUT_IO          (CONFIG_MOTOR_PIN_PWM) // Define the output GPIO
+#define LEDC_CHANNEL            LEDC_CHANNEL_1
+#define LEDC_DUTY_RES           LEDC_TIMER_10_BIT // Set duty resolution to 12 bits
+#define LEDC_DUTY               (0) // Set duty to 100%. (2 ** 10) * 100% = 4096
+#define LEDC_FREQUENCY          (25000) // Frequency in Hertz. Set frequency at 4 kHz
 
 #define MOTOR_TIMEOUT 10000
 #define HEATING_TIMEOUT 240000
@@ -35,12 +38,19 @@ typedef enum {
     CONTROL
 } COOKER_STATE;
 
+typedef struct {
+    uint16_t speed;
+    ledc_mode_t speed_mode;
+    ledc_channel_t channel;
+} motor_params;
+
 class Cooker
 {
 private:
     uint16_t _interval;
 
     bool _is_active = false;
+    bool _is_motor_active = false;
 
     float _thermo_tank;
     float _target_temp;
@@ -48,9 +58,13 @@ private:
     float _humidity;
     float _pressure;
 
+    motor_params* params_m = (motor_params *)malloc(sizeof(motor_params));
+
     uint32_t _previous_tick_motor = 0;
 
     COOKER_STATE _state = STANDBY;
+
+    TaskHandle_t xHandle;
 
     // Private functions for the state machine's states
 
@@ -98,6 +112,8 @@ public:
 
     void set_active(bool active);
     void set_target_temp(float temp);
+
+    static void start_motor(void* params);
 
 };
 

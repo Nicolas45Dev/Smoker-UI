@@ -18,7 +18,7 @@
 #define INACTIVE_TIMEOUT 20000
 #define PAGE_COUNT 5
 
-const uint8_t PAGE_OPTION_COUNT[PAGE_COUNT] = {0, 2, 4, 12, 5};
+const uint8_t PAGE_OPTION_COUNT[PAGE_COUNT] = {0, 2, 5, 12, 5};
 
 class Controller
 {
@@ -41,8 +41,8 @@ private:
     uint32_t current_tick = 0;
     uint32_t start_tick = 0;
 
-    uint32_t time_meat_1 = 0;
-    uint32_t time_meat_2 = 0;
+    char time_meat_1[8];
+    char time_meat_2[8];
 
     char thermo_tank[8];
     char thermo_meat1[8];
@@ -66,7 +66,7 @@ private:
     void readThermocouples();
 
 public:
-    Controller(uint8_t update_interval);
+    Controller();
     ~Controller();
 
     void run();

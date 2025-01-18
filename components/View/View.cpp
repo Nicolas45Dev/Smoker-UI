@@ -10,8 +10,8 @@ View::View() {
     this->meat_profile_data[5] = {5, "General smoking", -1, 120};
     this->meat_profile_data[6] = {6, "Pork high", 96, 120};
     this->meat_profile_data[7] = {7, "Pork low", 74, 120};
-    this->meat_profile_data[8] = {8, "Custom 1", -1, -1};
-    this->meat_profile_data[9] = {9, "Custom 2", -1, -1};
+    this->meat_profile_data[8] = {8, "Brisket", 91, 122};
+    this->meat_profile_data[9] = {9, "Custom 1", -1, -1};
 }
 
 View::~View() {
@@ -87,9 +87,9 @@ void View::drawMainPage(page_params_t &page_params)
         }
 
         // String for time 1
-        u8g2_DrawStr(&u8g2, 92, 31, std::to_string(page_params.time_meat1).c_str());
+        u8g2_DrawStr(&u8g2, 92, 31, page_params.time_meat1);
         // String for time 2
-        u8g2_DrawStr(&u8g2, 92, 55, std::to_string(page_params.time_meat2).c_str());
+        u8g2_DrawStr(&u8g2, 92, 55, page_params.time_meat2);
     }
     else {
         u8g2_DrawBitmap(&u8g2, 82, 12, 1, 8, thermometer);
@@ -109,11 +109,19 @@ void View::drawMenuPage(uint8_t selected_option) {
     u8g2_ClearBuffer(&u8g2);
     setPageHeader("Menu");
 
-    u8g2_DrawButtonUTF8(&u8g2, 8, 20, button_style[selected_option == 0], 0, 2, 2, "Meat profile");
-    u8g2_DrawButtonUTF8(&u8g2, 8, 36, button_style[selected_option == 1], 0, 2, 2, "Settings");
 
-    u8g2_DrawButtonUTF8(&u8g2, 8, 60, button_style[selected_option == 2], 0, 2, 2, "Save");
-    u8g2_DrawButtonUTF8(&u8g2, 90, 60, button_style[selected_option == 3], 0, 2, 2, "Exit");
+    if(selected_option < 1) {
+        u8g2_DrawButtonUTF8(&u8g2, 8, 20, button_style[selected_option == 0], 0, 2, 2, "Meat profile");
+        u8g2_DrawButtonUTF8(&u8g2, 8, 36, button_style[selected_option == 1], 0, 2, 2, "Settings");
+    }
+    
+    else {
+        u8g2_DrawButtonUTF8(&u8g2, 8, 20, button_style[selected_option == 1], 0, 2, 2, "Settings");
+        u8g2_DrawButtonUTF8(&u8g2, 8, 36, button_style[selected_option == 2], 0, 2, 2, "Close fire");
+    }
+
+    u8g2_DrawButtonUTF8(&u8g2, 8, 60, button_style[selected_option == 3], 0, 2, 2, "Save");
+    u8g2_DrawButtonUTF8(&u8g2, 90, 60, button_style[selected_option == 4], 0, 2, 2, "Exit");
 
     u8g2_SendBuffer(&u8g2);
 }
