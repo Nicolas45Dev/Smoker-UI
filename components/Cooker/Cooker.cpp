@@ -110,6 +110,30 @@ void Cooker::init_pwm()
 
     ledc_set_duty(LEDC_MODE, LEDC_CHANNEL, 0);
     ledc_update_duty(LEDC_MODE, LEDC_CHANNEL);
+
+    ledc_timer_config_t fan_timer_conf;
+    memset(&fan_timer_conf, 0, sizeof(ledc_timer_config_t));
+
+    fan_timer_conf.speed_mode = LEDC_MODE;
+    fan_timer_conf.duty_resolution = LEDC_FAN_DUTY_RES;
+    fan_timer_conf.timer_num = LEDC_FAN_TIMER;
+    fan_timer_conf.freq_hz = LEDC_FAN_FREQUENCY;
+    fan_timer_conf.clk_cfg = LEDC_AUTO_CLK;
+    ESP_ERROR_CHECK(ledc_timer_config(&fan_timer_conf));
+
+    ledc_channel_config_t fan_ledc_conf;
+    memset(&fan_ledc_conf, 0, sizeof(ledc_channel_config_t));
+
+    fan_ledc_conf.channel = LEDC_FAN_CHANNEL;
+    fan_ledc_conf.duty = 0;
+    fan_ledc_conf.gpio_num = LEDC_FAN_OUTPUT_IO;
+    fan_ledc_conf.speed_mode = LEDC_MODE;
+    fan_ledc_conf.timer_sel = LEDC_FAN_TIMER;
+    fan_ledc_conf.hpoint = 0;
+    ESP_ERROR_CHECK(ledc_channel_config(&fan_ledc_conf));
+
+    ledc_set_duty(LEDC_MODE, LEDC_FAN_CHANNEL, 0);
+    ledc_update_duty(LEDC_MODE, LEDC_FAN_CHANNEL);
 }
 
 // Public functions
@@ -133,6 +157,10 @@ Cooker::Cooker(const uint16_t interval)
     gpio_set_level(ENL0_PIN, 0);
     gpio_set_level(ENL1_PIN, 0);
     gpio_set_level(DIRECT_PIN, 0);
+
+    // Open the fan at maximum speed
+    ledc_set_duty(LEDC_MODE, LEDC_FAN_CHANNEL, 0);
+    ledc_update_duty(LEDC_MODE, LEDC_FAN_CHANNEL);
 }
 
 Cooker::~Cooker()

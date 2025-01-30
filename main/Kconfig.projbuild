@@ -34,10 +34,24 @@ menu "Smoker configuration"
             help
                 The SPI clock frequency in Hz.
 
-        config THERMOCOUPLE_SPI_CS
+        config THERMOCOUPLE_TANK_SPI_CS
             depends on SENSOR_TYPE_THERMOCOUPLE
             int "SPI chip select"
-            default 0
+            default 19
+            help
+                The SPI chip select to use.
+
+        config THERMOCOUPLE_MEAT1_SPI_CS
+            depends on SENSOR_TYPE_THERMOCOUPLE
+            int "SPI chip select"
+            default 20
+            help
+                The SPI chip select to use.
+
+        config THERMOCOUPLE_MEAT2_SPI_CS
+            depends on SENSOR_TYPE_THERMOCOUPLE
+            int "SPI chip select"
+            default 21
             help
                 The SPI chip select to use.
 
@@ -50,10 +64,10 @@ menu "Smoker configuration"
 
         config THERMISTOR_R0
             depends on SENSOR_TYPE_THERMISTOR
-            int "Thermistor resistance at 25C"
+            int "Thermistor resistance at 0C"
             default 10000
             help
-                The resistance of the thermistor at 25C.
+                The resistance of the thermistor at 0C.
 
         config THERMISTOR_BETA
             depends on SENSOR_TYPE_THERMISTOR
@@ -79,7 +93,7 @@ menu "Smoker configuration"
                 The pin to use for the smoke pump.
     endmenu
 
-    menu "Settings for motor"
+    menu "Settings for motor and fan"
         config MOTOR_PIN_DIRECTION
             int "Motor pin"
             default 11
@@ -91,6 +105,12 @@ menu "Smoker configuration"
             default 12
             help
                 The pin to use for the motor PWM.
+
+        config FAN_PIN_PWM
+            int "Fan PWM pin"
+            default 13
+            help
+                The pin to use for the fan PWM.
     endmenu
 
     menu "Setting for inputs"

@@ -1,3 +1,4 @@
+#include "sdkconfig.h"
 #include "Controller.hpp"
 #include <driver/gpio.h>
 #include <esp_log.h>
@@ -9,9 +10,10 @@
 
 #undef ESP_ERROR_CHECK
 #define ESP_ERROR_CHECK(x)   do { esp_err_t rc = (x); if (rc != ESP_OK) { ESP_LOGE("err", "esp_err_t = %d", rc); assert(0 && #x);} } while(0);
-#define SW_PIN (gpio_num_t)6
-#define ENA_PIN (gpio_num_t)4
-#define INB_PIN (gpio_num_t)5
+
+#define SW_PIN (gpio_num_t)CONFIG_ROTARY_ENCODER_PIN_BUTTON
+#define ENA_PIN (gpio_num_t)CONFIG_ROTARY_ENCODER_PIN_A
+#define INB_PIN (gpio_num_t)CONFIG_ROTARY_ENCODER_PIN_B
 
 Controller controller;
 

@@ -9,17 +9,20 @@
 #include "freertos/semphr.h"
 #include <MAX31855.hpp>
 #include <BME280.hpp>
+#include "sdkconfig.h"
 #include <stdio.h>
 #include <stdint.h>
 #include <string.h>
 
-#define THERMO_TANK_CS (gpio_num_t)19
-#define THERMO_MEAT1_CS (gpio_num_t)20
-#define THERMO_MEAT2_CS (gpio_num_t)21
+#ifdef CONFIG_SENSOR_TYPE_THERMOCOUPLE
+#define THERMO_TANK_CS (gpio_num_t)CONFIG_THERMOCOUPLE_TANK_SPI_CS
+#define THERMO_MEAT1_CS (gpio_num_t)CONFIG_THERMOCOUPLE_MEAT1_SPI_CS
+#define THERMO_MEAT2_CS (gpio_num_t)CONFIG_THERMOCOUPLE_MEAT2_SPI_CS
 
 #define THERMO_TANK_ACTIVE_LED (gpio_num_t)8
 #define THERMO_MEAT1_ACTIVE_LED (gpio_num_t)10
 #define THERMO_MEAT2_ACTIVE_LED (gpio_num_t)9
+#endif
 
 /**
  * @brief This class represents the model of the MVC pattern
