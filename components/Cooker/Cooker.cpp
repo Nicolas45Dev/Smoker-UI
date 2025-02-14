@@ -10,6 +10,13 @@ void Cooker::state_standby()
 
     ledc_set_duty(LEDC_MODE, LEDC_CHANNEL, 0);
     ledc_update_duty(LEDC_MODE, LEDC_CHANNEL);
+
+    // Close the fan
+    ledc_set_duty(LEDC_MODE, LEDC_FAN_CHANNEL, 0);
+    ledc_update_duty(LEDC_MODE, LEDC_FAN_CHANNEL);
+
+    counter = 0;
+    motor_open = false;
 }
 
 void Cooker::state_starting()
@@ -23,40 +30,60 @@ void Cooker::state_starting()
 
         params_m->channel = LEDC_CHANNEL;
         params_m->speed_mode = LEDC_MODE;
-        params_m->speed = 410;
+        params_m->speed = MOTOR_SPEED;
 
-        BaseType_t res = xTaskCreate(start_motor, "start_motor", 2048, (void *)params_m, 6, NULL);
+        // Open the fan
+        ledc_set_duty(LEDC_MODE, LEDC_FAN_CHANNEL, 1024);
+        ledc_update_duty(LEDC_MODE, LEDC_FAN_CHANNEL);
+
+        BaseType_t res = xTaskCreate(start_motor, "start_motor", 2048, (void *)params_m, 6, &xHandle);
         this->_is_motor_active = true;
-        xHandle = xTaskGetHandle("start_motor");
     }
 
-    xHandle = xTaskGetHandle("start_motor");
-
-    if(xHandle == NULL) {
-        // acceleration is done
-        ESP_LOGI("Cooker", "Linear");
-    }
-
-    if(xTaskGetTickCount() - _previous_tick_motor > HEATING_TIMEOUT) {
-        gpio_set_level(ENL1_PIN, 0);
-        _state = ACTIVE;
-        _previous_tick_motor = xTaskGetTickCount();
+    // Check if xHandle is not NULL
+    if(this->_is_motor_active && xHandle != NULL) {
+        
+        // Check if the motor task is done
+        if(eTaskGetState(xHandle) == eDeleted) {
+            
+            if (counter < FILL_TIME) {
+                gpio_set_level(DIRECT_PIN, 1); // Ouvre le moteur
+                ledc_set_duty(LEDC_MODE, LEDC_CHANNEL, MOTOR_SPEED);
+                ledc_update_duty(LEDC_MODE, LEDC_CHANNEL);
+                counter++;
+            }
+            else {
+                counter = 0;
+                this->_state = ACTIVE;
+            }
+        }
     }
 }
 
 void Cooker::state_active()
 {
-    // Open the motor for 1 second every 5 minutes
-    if(xTaskGetTickCount() - _previous_tick_motor > MOTOR_OPEN_TIMEOUT) {
-        gpio_set_level(DIRECT_PIN, 1);
-        ledc_set_duty(LEDC_MODE, LEDC_CHANNEL, 410);
+
+    if (!motor_open && counter < ON_CYCLE) {
+        gpio_set_level(DIRECT_PIN, 1); // Ouvre le moteur
+        ledc_set_duty(LEDC_MODE, LEDC_CHANNEL, MOTOR_SPEED);
         ledc_update_duty(LEDC_MODE, LEDC_CHANNEL);
-        _previous_tick_motor = xTaskGetTickCount();
+        motor_open = true;
+        counter = 0;
     }
-    else if(xTaskGetTickCount() - _previous_tick_motor > MOTOR_CLOSE_TIMEOUT) {
-        gpio_set_level(DIRECT_PIN, 0);
+    else if (motor_open && counter >= ON_CYCLE) {
+        gpio_set_level(DIRECT_PIN, 0); // Ferme le moteur
+        ledc_set_duty(LEDC_MODE, LEDC_CHANNEL, 0);
+        ledc_update_duty(LEDC_MODE, LEDC_CHANNEL);
     }
+
+    if (counter >= 60 + ON_CYCLE) {
+        motor_open = false;
+        counter = 0;
+    }
+
+    counter++; // Incrémente le compteur à chaque appel
 }
+
 
 void Cooker::state_purging()
 {
@@ -71,18 +98,19 @@ void Cooker::state_control()
 void Cooker::start_motor(void* params) {
     motor_params* params_motor_task = (motor_params *)params;
 
-    for (uint8_t i = 0; i < params_motor_task->speed / 8; i++) {
+    for (uint8_t i = 0; i < params_motor_task->speed / 16; i++) {
 
-        ledc_set_duty(params_motor_task->speed_mode, params_motor_task->channel, i * 8);
+        ledc_set_duty(params_motor_task->speed_mode, params_motor_task->channel, i * 16);
         ledc_update_duty(params_motor_task->speed_mode, params_motor_task->channel);
 
-        vTaskDelay(20 / portTICK_PERIOD_MS);
+        vTaskDelay(15 / portTICK_PERIOD_MS);
     }
 
     ledc_set_duty(params_motor_task->speed_mode, params_motor_task->channel, params_motor_task->speed);
     ledc_update_duty(params_motor_task->speed_mode, params_motor_task->channel);
 
     vTaskDelete(NULL);
+    
 }
 
 void Cooker::init_pwm()
@@ -108,7 +136,7 @@ void Cooker::init_pwm()
     ledc_conf.hpoint = 0;
     ESP_ERROR_CHECK(ledc_channel_config(&ledc_conf));
 
-    ledc_set_duty(LEDC_MODE, LEDC_CHANNEL, 0);
+    ledc_set_duty(LEDC_MODE, LEDC_CHANNEL, 300);
     ledc_update_duty(LEDC_MODE, LEDC_CHANNEL);
 
     ledc_timer_config_t fan_timer_conf;
@@ -142,6 +170,8 @@ Cooker::Cooker(const uint16_t interval)
 {
     _interval = interval;
 
+    xTimer = xTimerCreate("timer", pdMS_TO_TICKS(10000), pdFALSE, (void *)this, timer_callback);
+
     // Initialize the GPIOs
     gpio_config_t io_conf;
     io_conf.intr_type = GPIO_INTR_DISABLE;
@@ -158,9 +188,6 @@ Cooker::Cooker(const uint16_t interval)
     gpio_set_level(ENL1_PIN, 0);
     gpio_set_level(DIRECT_PIN, 0);
 
-    // Open the fan at maximum speed
-    ledc_set_duty(LEDC_MODE, LEDC_FAN_CHANNEL, 0);
-    ledc_update_duty(LEDC_MODE, LEDC_FAN_CHANNEL);
 }
 
 Cooker::~Cooker()
@@ -217,4 +244,11 @@ void Cooker::set_target_temp(float temp)
 {
     // Set the target temperature
     this->_target_temp = temp;
+}
+
+void Cooker::set_travel(float travel)
+{
+    if(_state == COOKER_STATE::CONTROL) {
+        // Set the travel
+    }
 }

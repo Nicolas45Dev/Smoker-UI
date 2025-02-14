@@ -40,10 +40,10 @@ void Controller::run() {
         thermocouple_update_tick = current_tick;
     }
 
-    // if(current_tick - cooker_update_tick >= COOKER_INTERVAL) {
-    //     cooker_update_tick = current_tick;
-    //     cooker.cooker_work();
-    // }
+    if(current_tick - cooker_update_tick >= COOKER_INTERVAL) {
+        cooker_update_tick = current_tick;
+        cooker.cooker_work();
+    }
 
     // update view
     updateView();
@@ -150,8 +150,8 @@ void Controller::setMeatProfilePageFromOption() {
 
         model->setPageIndex(1);
 
-        //cooker.set_active(true);
-        //cooker.set_target_temp(view.getMeatProfileData(option_change).tank_temp);
+        cooker.set_active(true);
+        cooker.set_target_temp(view.getMeatProfileData(option_change).tank_temp);
 
         break;
     }
@@ -187,6 +187,9 @@ void Controller::readThermocouples() {
 
     model->getThermoMeat1SetTemp(thermo_meat1_set);
     model->getThermoMeat2SetTemp(thermo_meat2_set);
-    model->setThermoMeat1SetTime(time_meat_1);
-    model->setThermoMeat2SetTime(time_meat_2);
+    
+    if(cooker.get_active) {
+        model->setThermoMeat1SetTime(time_meat_1);
+        model->setThermoMeat2SetTime(time_meat_2);
+    }
 }
