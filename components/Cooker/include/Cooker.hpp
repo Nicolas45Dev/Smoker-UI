@@ -71,8 +71,8 @@ private:
     float _humidity;
     float _pressure;
 
-    static bool motor_open = false;
-    static uint32_t counter = 0;
+    bool motor_open = false;
+    uint32_t counter = 0;
 
     motor_params* params_m = (motor_params *)malloc(sizeof(motor_params));
 

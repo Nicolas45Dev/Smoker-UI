@@ -178,6 +178,9 @@ void Controller::setPageParams(bool withOption) {
     page_params.time_meat1 = time_meat_1;
     page_params.time_meat2 = time_meat_2;
     page_params.selected_option = withOption ? option_change : 0;
+    page_params.bme280_data_temp = bme280_temp;
+    page_params.bme280_data_hum = bme280_hum;
+    //page_params.bme280_data_press = bme280_press;
 }
 
 void Controller::readThermocouples() {
@@ -188,8 +191,11 @@ void Controller::readThermocouples() {
     model->getThermoMeat1SetTemp(thermo_meat1_set);
     model->getThermoMeat2SetTemp(thermo_meat2_set);
     
-    if(cooker.get_active) {
+    if(cooker.get_active()) {
         model->setThermoMeat1SetTime(time_meat_1);
         model->setThermoMeat2SetTime(time_meat_2);
     }
+
+    model->readBME280(2, bme280_hum);
+    model->readBME280(0, bme280_temp);
 }

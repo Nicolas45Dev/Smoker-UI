@@ -53,6 +53,10 @@ private:
     float previous_thermo_1;
     float previous_thermo_2;
 
+    char bme280_temp[5];
+    char bme280_hum[5];
+    char bme280_press[6];
+
     View view;
     Model* model;
     Cooker cooker;

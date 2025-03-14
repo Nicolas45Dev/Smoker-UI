@@ -18,6 +18,8 @@ BME280::BME280() {
     readCalibrationData();
 
     setCtrlMeas();
+
+    gpio_set_level(BME280_CS, 0);
 }
 
 BME280::~BME280() {
@@ -105,6 +107,13 @@ void BME280::readCalibrationData() {
     press = (rx_buffer[24] << 8) | rx_buffer[23];
     dig_P9 = (int16_t)press;
 
+    // // print temperature calibration data
+    // printf("dig_T1: %d, dig_T2: %d, dig_T3: %d\n", dig_T1, dig_T2, dig_T3);
+
+    // // print pressure calibration data
+    // printf("dig_P1: %d, dig_P2: %d, dig_P3: %d, dig_P4: %d, dig_P5: %d, dig_P6: %d, dig_P7: %d, dig_P8: %d, dig_P9: %d\n",
+    //     dig_P1, dig_P2, dig_P3, dig_P4, dig_P5, dig_P6, dig_P7, dig_P8, dig_P9);
+
     uint8_t spi_byte2 = BME280_CALIB_HUM_1_REG;
     tx_buffer[0] = setBit(true, spi_byte2);
     spi->writeRead(tx_buffer, 2, rx_buffer, 2, BME280_CS);
@@ -119,8 +128,16 @@ void BME280::readCalibrationData() {
     dig_H3 = rx_buffer[3];
 
     dig_H4 = (int16_t)((rx_buffer[4] << 4) | (rx_buffer[5] & 0x0F));
+    if (dig_H4 & 0x0800) dig_H4 |= 0xF000; // Étendre le signe si négatif
+
     dig_H5 = (int16_t)((rx_buffer[6] << 4) | ((rx_buffer[5] >> 4) & 0x0F));
+    if (dig_H5 & 0x0800) dig_H5 |= 0xF000; // Étendre le signe si négatif
+
     dig_H6 = (int8_t)rx_buffer[7];
+
+    // printf("dig_H1: %d, dig_H2: %d, dig_H3: %d, dig_H4: %d, dig_H5: %d, dig_H6: %d\n",
+    //    dig_H1, dig_H2, dig_H3, dig_H4, dig_H5, dig_H6);
+
 }
 
 void BME280::readTemperature() {
@@ -131,7 +148,8 @@ void BME280::readTemperature() {
 
     spi->writeRead(tx_buffer, 3, rx_buffer, 3, BME280_CS);
 
-    uint32_t adc_T = (rx_buffer[1] << 12) | (rx_buffer[2] << 4) | (rx_buffer[3]);
+    uint32_t adc_T = (rx_buffer[1] << 16) | (rx_buffer[2] << 8) | (rx_buffer[3]);
+    adc_T >>= 4;
 
     int32_t var1, var2;
 
@@ -140,6 +158,7 @@ void BME280::readTemperature() {
     t_fine = var1 + var2;
 
     temperature = (float)((t_fine * 5 + 128) >> 8) / 100;
+    //printf("Temperature: %f\n", temperature);
 }
 
 void BME280::readPressure() {
@@ -150,7 +169,8 @@ void BME280::readPressure() {
 
     spi->writeRead(tx_buffer, 3, rx_buffer, 3, BME280_CS);
 
-    uint32_t adc_P = (rx_buffer[1] << 12) | (rx_buffer[2] << 4) | (rx_buffer[3]);
+    uint32_t adc_P = (rx_buffer[1] << 16) | (rx_buffer[2] << 8) | (rx_buffer[3]);
+    adc_P >>= 4;
 
     int64_t var1, var2, p;
     var1 = ((int64_t)t_fine) - 128000;
@@ -167,6 +187,7 @@ void BME280::readPressure() {
     p = ((p + var1 + var2) >> 8) + (((int64_t)dig_P7) << 4);
 
     pressure = (float)p / 256.0;
+    //printf("Pressure: %f\n", pressure);
 }
 
 void BME280::readHumidity() {
@@ -198,6 +219,7 @@ void BME280::readHumidity() {
     uint32_t h = (uint32_t)(var5 / 4096);
 
     humidity = (float)h / 1024.0;
+    //printf("Humidity: %f\n", humidity);
 }
 
 uint8_t BME280::setBit(bool read, uint8_t reg) {
