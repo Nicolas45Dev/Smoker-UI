@@ -2,7 +2,6 @@
 
 BME280::BME280() {
     spi = SPI::getInstance();
-    spi->init();
 
     // Initialize the gpio pin for the BME280
     gpio_config_t io_conf;
@@ -107,13 +106,6 @@ void BME280::readCalibrationData() {
     press = (rx_buffer[24] << 8) | rx_buffer[23];
     dig_P9 = (int16_t)press;
 
-    // // print temperature calibration data
-    // printf("dig_T1: %d, dig_T2: %d, dig_T3: %d\n", dig_T1, dig_T2, dig_T3);
-
-    // // print pressure calibration data
-    // printf("dig_P1: %d, dig_P2: %d, dig_P3: %d, dig_P4: %d, dig_P5: %d, dig_P6: %d, dig_P7: %d, dig_P8: %d, dig_P9: %d\n",
-    //     dig_P1, dig_P2, dig_P3, dig_P4, dig_P5, dig_P6, dig_P7, dig_P8, dig_P9);
-
     uint8_t spi_byte2 = BME280_CALIB_HUM_1_REG;
     tx_buffer[0] = setBit(true, spi_byte2);
     spi->writeRead(tx_buffer, 2, rx_buffer, 2, BME280_CS);
@@ -135,9 +127,6 @@ void BME280::readCalibrationData() {
 
     dig_H6 = (int8_t)rx_buffer[7];
 
-    // printf("dig_H1: %d, dig_H2: %d, dig_H3: %d, dig_H4: %d, dig_H5: %d, dig_H6: %d\n",
-    //    dig_H1, dig_H2, dig_H3, dig_H4, dig_H5, dig_H6);
-
 }
 
 void BME280::readTemperature() {
@@ -158,36 +147,35 @@ void BME280::readTemperature() {
     t_fine = var1 + var2;
 
     temperature = (float)((t_fine * 5 + 128) >> 8) / 100;
-    //printf("Temperature: %f\n", temperature);
 }
 
 void BME280::readPressure() {
-    uint8_t spi_byte = BME280_PRESS_MSB_REG;
-    uint8_t tx_buffer[3] = {0, 0, 0};
-    tx_buffer[0] = setBit(true, spi_byte);
-    uint8_t rx_buffer[4];
+    // uint8_t spi_byte = BME280_PRESS_MSB_REG;
+    // uint8_t tx_buffer[3] = {0, 0, 0};
+    // tx_buffer[0] = setBit(true, spi_byte);
+    // uint8_t rx_buffer[4];
 
-    spi->writeRead(tx_buffer, 3, rx_buffer, 3, BME280_CS);
+    // spi->writeRead(tx_buffer, 3, rx_buffer, 3, BME280_CS);
 
-    uint32_t adc_P = (rx_buffer[1] << 16) | (rx_buffer[2] << 8) | (rx_buffer[3]);
-    adc_P >>= 4;
+    // uint32_t adc_P = (rx_buffer[1] << 16) | (rx_buffer[2] << 8) | (rx_buffer[3]);
+    // adc_P >>= 4;
 
-    int64_t var1, var2, p;
-    var1 = ((int64_t)t_fine) - 128000;
-    var2 = var1 * var1 * (int64_t)dig_P6;
-    var2 = var2 + ((var1 * (int64_t)dig_P5) << 17);
-    var2 = var2 + (((int64_t)dig_P4) << 35);
-    var1 = ((var1 * var1 * (int64_t)dig_P3) >> 8) + ((var1 * (int64_t)dig_P2) << 12);
-    var1 = (((((int64_t)1) << 47) + var1)) * ((int64_t)dig_P1) >> 33;
+    // int64_t var1, var2, p;
+    // var1 = ((int64_t)t_fine) - 128000;
+    // var2 = var1 * var1 * (int64_t)dig_P6;
+    // var2 = var2 + ((var1 * (int64_t)dig_P5) << 17);
+    // var2 = var2 + (((int64_t)dig_P4) << 35);
+    // var1 = ((var1 * var1 * (int64_t)dig_P3) >> 8) + ((var1 * (int64_t)dig_P2) << 12);
+    // var1 = (((((int64_t)1) << 47) + var1)) * ((int64_t)dig_P1) >> 33;
 
-    p = 1048576 - adc_P;
-    p = (((p << 31) - var2) * 3125) / var1;
-    var1 = (((int64_t)dig_P9) * (p >> 13) * (p >> 13)) >> 25;
-    var2 = (((int64_t)dig_P8) * p) >> 19;
-    p = ((p + var1 + var2) >> 8) + (((int64_t)dig_P7) << 4);
+    // p = 1048576 - adc_P;
+    // p = (((p << 31) - var2) * 3125) / var1;
+    // var1 = (((int64_t)dig_P9) * (p >> 13) * (p >> 13)) >> 25;
+    // var2 = (((int64_t)dig_P8) * p) >> 19;
+    // p = ((p + var1 + var2) >> 8) + (((int64_t)dig_P7) << 4);
 
-    pressure = (float)p / 256.0;
-    //printf("Pressure: %f\n", pressure);
+    // pressure = (float)p / 256.0;
+    pressure = 101325.0; // Placeholder value
 }
 
 void BME280::readHumidity() {
@@ -219,7 +207,6 @@ void BME280::readHumidity() {
     uint32_t h = (uint32_t)(var5 / 4096);
 
     humidity = (float)h / 1024.0;
-    //printf("Humidity: %f\n", humidity);
 }
 
 uint8_t BME280::setBit(bool read, uint8_t reg) {

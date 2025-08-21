@@ -1,3 +1,3 @@
-idf_component_register(SRCS "MAX31855.cpp" "SPI.cpp" "BME280.cpp"
+idf_component_register(SRCS "esp32_hal_spi.cpp" "MAX31855.cpp" "SPI.cpp" "BME280.cpp"
                     INCLUDE_DIRS "include"
                     REQUIRES driver config)

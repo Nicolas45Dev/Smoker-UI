@@ -2,7 +2,6 @@
 
 MAX31855::MAX31855(gpio_num_t pin_cs, gpio_num_t active_led) {
     spi = SPI::getInstance();
-    spi->init();
     this->pin_cs = pin_cs;
     this->active_led = active_led;
 
@@ -34,7 +33,7 @@ bool MAX31855::isProbeConnected() {
     uint8_t tx_buffer[4];
     tx_buffer[0] = 0x00;
     uint8_t rx_buffer[4];
-    spi->read(rx_buffer, 4, pin_cs);
+    spi->read(rx_buffer, 4, this->pin_cs);
 
     uint32_t data32 = (rx_buffer[0] << 24) | (rx_buffer[1] << 16) | (rx_buffer[2] << 8) | rx_buffer[3];
 
@@ -52,7 +51,7 @@ float MAX31855::readTemperature(TEMP_UNIT unit) {
     uint8_t tx_buffer[4];
     tx_buffer[0] = 0x00;
     uint8_t rx_buffer[4];
-    spi->read(rx_buffer, 4, pin_cs);
+    spi->read(rx_buffer, 4, this->pin_cs);
 
     uint32_t data32 = (rx_buffer[0] << 24) | (rx_buffer[1] << 16) | (rx_buffer[2] << 8) | rx_buffer[3];
 
