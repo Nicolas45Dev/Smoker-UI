@@ -19,5 +19,5 @@ void SPI::read(uint8_t* data, size_t len, uint8_t cs_pin) {
 }
 
 void SPI::writeRead(const uint8_t* tx_data, size_t tx_len, uint8_t* rx_data, size_t rx_len, uint8_t cs_pin) {
-    // m_spi->writeRead(tx_data, tx_len, rx_data, rx_len, cs_pin);
+    m_spi->writeRead(tx_data, tx_len, rx_data, rx_len, cs_pin);
 }

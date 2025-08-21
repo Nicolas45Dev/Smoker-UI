@@ -39,9 +39,9 @@ namespace encoder_esp32_hal {
     IRAM_ATTR void rotaryEncoderInterrupt(void *arg) {
         // if ENB_PIN is high, then the direction is clockwise
         if(gpio_get_level(INB_PIN)) {
-            option_change = 1;
-        } else {
             option_change = -1;
+        } else {
+            option_change = 1;
         }
     }
 

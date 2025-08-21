@@ -1,6 +1,12 @@
 #include "BME280.hpp"
 
 BME280::BME280() {
+}
+
+BME280::~BME280() {
+}
+
+void BME280::init() {
     spi = SPI::getInstance();
 
     // Initialize the gpio pin for the BME280
@@ -19,9 +25,6 @@ BME280::BME280() {
     setCtrlMeas();
 
     gpio_set_level(BME280_CS, 0);
-}
-
-BME280::~BME280() {
 }
 
 float BME280::getTemperature(TEMP_UNIT unit) {
@@ -133,7 +136,7 @@ void BME280::readTemperature() {
     uint8_t spi_byte = BME280_TEMP_MSB_REG;
     uint8_t tx_buffer[3] = {0, 0, 0};
     tx_buffer[0] = setBit(true, spi_byte);
-    uint8_t rx_buffer[4];
+    uint8_t rx_buffer[3];
 
     spi->writeRead(tx_buffer, 3, rx_buffer, 3, BME280_CS);
 

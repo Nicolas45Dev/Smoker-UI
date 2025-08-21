@@ -28,6 +28,15 @@ bool Controller::init() {
 void Controller::run() {
     current_tick = xTaskGetTickCount();
 
+    // Check the encoder inputs
+    if (Encoder::isOptionChanged()) {
+        setOptionChange(Encoder::getOptionChange());
+    }
+
+    if (Encoder::isPageChanged()) {
+        setPageChange();
+    }
+
     if(current_tick - start_tick >= 2000 && starting) {
         starting = false;
         model->setPageIndex(1);

@@ -17,10 +17,28 @@ namespace Encoder {
     void init();
 
     /**
-     * @brief Run the main processing loop for the encoder
+     * @brief Check if the option has changed
      * 
+     * @return true 
+     * @return false 
      */
-    void process();
+    bool isOptionChanged();
+
+    /**
+     * @brief Check if the page has changed
+     * 
+     * @return true 
+     * @return false 
+     */
+    bool isPageChanged();
+
+    /**
+     * @brief Get the Option Change object
+     * 
+     * @return true 
+     * @return false 
+     */
+    bool getOptionChange();
 };
 
 #endif

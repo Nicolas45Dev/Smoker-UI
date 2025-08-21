@@ -4,6 +4,7 @@
 #include "Cooker.hpp"
 #include <driver/gpio.h>
 #include <esp_log.h>
+#include "Encoder.hpp"
 #include <Model.hpp>
 #include <stdio.h>
 #include <View.hpp>

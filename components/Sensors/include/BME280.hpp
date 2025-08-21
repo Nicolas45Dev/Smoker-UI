@@ -81,6 +81,8 @@ public:
     BME280();
     ~BME280();
 
+    void init();
+
     /**
      * @brief Get the Temperature object
      * 

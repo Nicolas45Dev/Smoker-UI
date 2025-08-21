@@ -1,20 +1,25 @@
 #include "Encoder.hpp"
 
+static int8_t change = 0;
+static uint8_t page = 0;
+
 namespace Encoder {
     void init() {
         encoder_esp32_hal::init();
     }
 
-    void process() {
-        if (encoder_esp32_hal::isOptionChange()) {
-            int8_t change = encoder_esp32_hal::getOptionChange();
-            // Handle the option change, e.g., update a setting or UI element
-        }
+    bool isOptionChanged() {
+        return encoder_esp32_hal::isOptionChange();
+    }
 
-        if (encoder_esp32_hal::isPageChange()) {
-            uint8_t change = encoder_esp32_hal::getPageChange();
-            // Handle the page change, e.g., switch to a different screen
-        }
+    bool isPageChanged() {
+        bool is_page = encoder_esp32_hal::isPageChange();
+        encoder_esp32_hal::getPageChange();
+        return is_page;
+    }
+
+    bool getOptionChange() {
+        return encoder_esp32_hal::getOptionChange() == 1;
     }
 }
 
