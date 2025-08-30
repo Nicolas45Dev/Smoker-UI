@@ -1,5 +1,6 @@
 #include "sdkconfig.h"
 #include "Controller.hpp"
+#include "console_register.h"
 #include <driver/gpio.h>
 #include "Encoder.hpp"
 #include <esp_log.h>
@@ -7,7 +8,6 @@
 #include <freertos/task.h>
 #include <stdio.h>
 #include <string.h>
-#include "driver/ledc.h"
 
 #undef ESP_ERROR_CHECK
 #define ESP_ERROR_CHECK(x)   do { esp_err_t rc = (x); if (rc != ESP_OK) { ESP_LOGE("err", "esp_err_t = %d", rc); assert(0 && #x);} } while(0);
@@ -27,6 +27,10 @@ void runController(void *pvParameter) {
 }
 
 extern "C" void app_main() {
+#ifdef CONFIG_APP_CONSOLE_ENABLED
+    init_console();
+#endif
+
     // Initialize all components
     Encoder::init();
 

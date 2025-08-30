@@ -133,4 +133,39 @@ menu "Smoker configuration"
                 The pin to use for the rotary encoder button.
     endmenu
 
+    # Console configuration
+    menu "Console configuration"
+        config APP_CONSOLE_ENABLED
+            bool "Enable interactive console (ESP-IDF console/REPL)"
+            default y
+            help
+                Enable an interactive console to run commands at runtime.
+
+        choice APP_CONSOLE_TRANSPORT
+            prompt "Console transport"
+            depends on APP_CONSOLE_ENABLED
+            default APP_CONSOLE_UART
+            help
+                Select how the console connects.
+
+            config APP_CONSOLE_UART
+                bool "UART (serial)"
+                help
+                    Use UART0 for console REPL.
+
+            config APP_CONSOLE_USB
+                bool "USB CDC (ESP32-S2/S3/C3 with TinyUSB)"
+                help
+                    Use USB CDC for console REPL. Requires enabling TinyUSB CDC-ACM in menuconfig.
+        endchoice
+
+        config APP_CONSOLE_BAUD
+            int "UART baud rate"
+            depends on APP_CONSOLE_ENABLED && APP_CONSOLE_UART
+            range 9600 921600
+            default 115200
+            help
+                UART baud rate for console.
+    endmenu
+
 endmenu
