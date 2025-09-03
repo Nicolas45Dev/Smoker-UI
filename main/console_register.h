@@ -12,12 +12,16 @@
 
 #define CLI_TAG "console"
 
-#define CLI_CHECK_VALUE_LIMITS(min, max, val) do { \
-    if ((val) < (min) || (val) > (max)) { \
-        ESP_LOGE(CLI_TAG, "Invalid argument, value=%d, expected range: %d..%d", val, min, max); \
-        return 1; \
-    } \
-} while(0)
+// Turn the value check into a type-safe inline function (avoids macro pitfalls)
+static inline int cli_check_value_limits(int min, int max, int val) {
+    if ((val) < (min) || (val) > (max)) {
+        ESP_LOGE(CLI_TAG, "Invalid argument, value=%d, expected range: %d..%d", (int)val, (int)min, (int)max);
+        return 1;
+    }
+    return 0;
+}
+// Backward-compatible macro wrapper
+#define CLI_CHECK_VALUE_LIMITS(min, max, val) cli_check_value_limits((int)(min), (int)(max), (int)(val))
 
 #ifdef CONFIG_APP_CONSOLE_ENABLED
 // Example command: set_led <intensity> <name>
@@ -63,9 +67,9 @@ static void init_console()
     setvbuf(stdout, NULL, _IONBF, 0);
     setvbuf(stderr, NULL, _IONBF, 0);
 
-    // Line endings
-    esp_vfs_dev_uart_set_rx_line_endings(ESP_LINE_ENDINGS_CR);
-    esp_vfs_dev_uart_set_tx_line_endings(ESP_LINE_ENDINGS_CRLF);
+    // Line endings (use non-deprecated, port-specific APIs)
+    esp_vfs_dev_uart_port_set_rx_line_endings(UART_NUM_0, ESP_LINE_ENDINGS_CR);
+    esp_vfs_dev_uart_port_set_tx_line_endings(UART_NUM_0, ESP_LINE_ENDINGS_CRLF);
 
     const uart_config_t uart_config = {
         .baud_rate = CONFIG_APP_CONSOLE_BAUD,
@@ -73,11 +77,13 @@ static void init_console()
         .parity    = UART_PARITY_DISABLE,
         .stop_bits = UART_STOP_BITS_1,
         .flow_ctrl = UART_HW_FLOWCTRL_DISABLE,
+        .rx_flow_ctrl_thresh = 0,
     #if SOC_UART_SUPPORT_REF_TICK
         .source_clk = UART_SCLK_REF_TICK,
     #else
         .source_clk = UART_SCLK_DEFAULT,
     #endif
+        .flags = 0,
     };
     ESP_ERROR_CHECK(uart_driver_install(UART_NUM_0, 256, 0, 0, NULL, 0));
     ESP_ERROR_CHECK(uart_param_config(UART_NUM_0, &uart_config));

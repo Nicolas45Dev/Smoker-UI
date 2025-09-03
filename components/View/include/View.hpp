@@ -11,10 +11,10 @@
 #include <u8g2_esp32_hal.hpp>
 #include <string>
 
-#define PIN_CLK (gpio_num_t)40
-#define PIN_MOSI (gpio_num_t)41
-#define PIN_RESET (gpio_num_t)45
-#define PIN_CS (gpio_num_t)42
+#define PIN_CLK_VIEW (gpio_num_t)40
+#define PIN_MOSI_VIEW (gpio_num_t)41
+#define PIN_RESET_VIEW (gpio_num_t)45
+#define PIN_CS_VIEW (gpio_num_t)42
 
 typedef struct {
     char* temp_tank1;

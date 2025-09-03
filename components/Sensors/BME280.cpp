@@ -33,8 +33,10 @@ float BME280::getTemperature(TEMP_UNIT unit) {
     switch(unit) {
         case FAHRENHEIT_UNIT:
             new_temperature = CELSIUS_TO_FAHRENHEIT(temperature);
+            break;
         case KELVIN_UNIT:
             new_temperature = CELSIUS_TO_KELVIN(temperature);
+            break;
         default:
             return temperature;
     }
@@ -47,12 +49,16 @@ float BME280::getPressure(PERSSURE_UNIT unit) {
     switch(unit) {
         case HPA_UNIT:
             new_pressure = PASCAL_TO_HECTOPASCAL(pressure);
+            break;
         case PSI_UNIT:
             new_pressure = PASCAL_TO_PSI(pressure);
+            break;
         case BAR_UNIT:
             new_pressure = PASCAL_TO_BAR(pressure);
+            break;
         case ATM_UNIT:
             new_pressure = PASCAL_TO_ATMOSPHERE(pressure);
+            break;
         default:
             return pressure;
     }
@@ -153,32 +159,31 @@ void BME280::readTemperature() {
 }
 
 void BME280::readPressure() {
-    // uint8_t spi_byte = BME280_PRESS_MSB_REG;
-    // uint8_t tx_buffer[3] = {0, 0, 0};
-    // tx_buffer[0] = setBit(true, spi_byte);
-    // uint8_t rx_buffer[4];
+    uint8_t spi_byte = BME280_PRESS_MSB_REG;
+    uint8_t tx_buffer[3] = {0, 0, 0};
+    tx_buffer[0] = setBit(true, spi_byte);
+    uint8_t rx_buffer[4];
 
-    // spi->writeRead(tx_buffer, 3, rx_buffer, 3, BME280_CS);
+    spi->writeRead(tx_buffer, 3, rx_buffer, 3, BME280_CS);
 
-    // uint32_t adc_P = (rx_buffer[1] << 16) | (rx_buffer[2] << 8) | (rx_buffer[3]);
-    // adc_P >>= 4;
+    uint32_t adc_P = (rx_buffer[1] << 16) | (rx_buffer[2] << 8) | (rx_buffer[3]);
+    adc_P >>= 4;
 
-    // int64_t var1, var2, p;
-    // var1 = ((int64_t)t_fine) - 128000;
-    // var2 = var1 * var1 * (int64_t)dig_P6;
-    // var2 = var2 + ((var1 * (int64_t)dig_P5) << 17);
-    // var2 = var2 + (((int64_t)dig_P4) << 35);
-    // var1 = ((var1 * var1 * (int64_t)dig_P3) >> 8) + ((var1 * (int64_t)dig_P2) << 12);
-    // var1 = (((((int64_t)1) << 47) + var1)) * ((int64_t)dig_P1) >> 33;
+    int64_t var1, var2, p;
+    var1 = ((int64_t)t_fine) - 128000;
+    var2 = var1 * var1 * (int64_t)dig_P6;
+    var2 = var2 + ((var1 * (int64_t)dig_P5) << 17);
+    var2 = var2 + (((int64_t)dig_P4) << 35);
+    var1 = ((var1 * var1 * (int64_t)dig_P3) >> 8) + ((var1 * (int64_t)dig_P2) << 12);
+    var1 = (((((int64_t)1) << 47) + var1)) * ((int64_t)dig_P1) >> 33;
 
-    // p = 1048576 - adc_P;
-    // p = (((p << 31) - var2) * 3125) / var1;
-    // var1 = (((int64_t)dig_P9) * (p >> 13) * (p >> 13)) >> 25;
-    // var2 = (((int64_t)dig_P8) * p) >> 19;
-    // p = ((p + var1 + var2) >> 8) + (((int64_t)dig_P7) << 4);
+    p = 1048576 - adc_P;
+    p = (((p << 31) - var2) * 3125) / var1;
+    var1 = (((int64_t)dig_P9) * (p >> 13) * (p >> 13)) >> 25;
+    var2 = (((int64_t)dig_P8) * p) >> 19;
+    p = ((p + var1 + var2) >> 8) + (((int64_t)dig_P7) << 4);
 
-    // pressure = (float)p / 256.0;
-    pressure = 101325.0; // Placeholder value
+    pressure = (float)p / 256.0;
 }
 
 void BME280::readHumidity() {

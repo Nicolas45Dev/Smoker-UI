@@ -19,10 +19,10 @@ View::~View() {
 
 void View::initDisplay() {
     u8g2_esp32_hal_t u8g2_esp32_hal = U8G2_ESP32_HAL_DEFAULT;
-    u8g2_esp32_hal.bus.spi.clk = PIN_CLK;
-    u8g2_esp32_hal.bus.spi.mosi = PIN_MOSI;
-    u8g2_esp32_hal.bus.spi.cs = PIN_CS;
-    u8g2_esp32_hal.reset = PIN_RESET;
+    u8g2_esp32_hal.bus.spi.clk = PIN_CLK_VIEW;
+    u8g2_esp32_hal.bus.spi.mosi = PIN_MOSI_VIEW;
+    u8g2_esp32_hal.bus.spi.cs = PIN_CS_VIEW;
+    u8g2_esp32_hal.reset = PIN_RESET_VIEW;
     u8g2_esp32_hal_init(u8g2_esp32_hal);
 
     u8g2_Setup_st7920_s_128x64_f(
@@ -44,8 +44,6 @@ void View::drawLogoPage() {
 void View::drawMainPage(page_params_t &page_params)
 {
     char buffer_t1[10];
-    char buffer_t2[10];
-    char buffer_t3[10];
 
     u8g2_ClearBuffer(&u8g2);
     u8g2_DrawBitmap(&u8g2, 0, 10, 10, 46, tank);

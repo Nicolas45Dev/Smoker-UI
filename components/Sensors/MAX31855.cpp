@@ -30,8 +30,6 @@ MAX31855::~MAX31855() {
 }
 
 bool MAX31855::isProbeConnected() {
-    uint8_t tx_buffer[4];
-    tx_buffer[0] = 0x00;
     uint8_t rx_buffer[4];
     spi->read(rx_buffer, 4, this->pin_cs);
 
@@ -48,8 +46,6 @@ bool MAX31855::isProbeConnected() {
 }
 
 float MAX31855::readTemperature(TEMP_UNIT unit) {
-    uint8_t tx_buffer[4];
-    tx_buffer[0] = 0x00;
     uint8_t rx_buffer[4];
     spi->read(rx_buffer, 4, this->pin_cs);
 

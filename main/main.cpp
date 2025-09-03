@@ -34,5 +34,5 @@ extern "C" void app_main() {
     // Initialize all components
     Encoder::init();
 
-    xTaskCreate(runController, "runController", 10000, NULL, 5, NULL);
+    xTaskCreate(runController, "runController", 6192, NULL, 4, NULL);
 }

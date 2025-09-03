@@ -31,4 +31,12 @@ typedef enum {
 #define PASCAL_TO_BAR(x) (x / 100000)
 #define PASCAL_TO_PSI(x) (x / 6894.75729)
 
+#define ADC_MAX_VALUE 4095.0
+#define ADC_REF_VOLTAGE 3.3
+
+// ADC channels
+#define T1_TEMP ADC_CHANNEL ADC1_CHANNEL_0 // GPIO36
+#define T2_TEMP ADC_CHANNEL ADC1_CHANNEL_3 // GPIO39
+#define TINT_TEMP ADC_CHANNEL ADC1_CHANNEL_6 // GPIO34
+
 #endif // CONFIG_H
