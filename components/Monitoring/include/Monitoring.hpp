@@ -6,6 +6,10 @@
 const float A = 0.001129148;
 const float B = 0.000234125;
 const float C = 0.0000000876741;
+const float ADC_VOLTAGE_REF = 1.1; // Reference voltage for ADC in volts
+const float SERIES_RESISTOR = 10000.0; // Value of the series resistor in ohms
+const float NOMINAL_RESISTANCE = 1000.0; // Resistance at 25 degrees C for the thermistor
+const float NOMINAL_TEMPERATURE = 25.0; // Nominal temperature value in degrees C
 
 /***
  * @brief Monitoring namespace
@@ -21,8 +25,7 @@ const float C = 0.0000000876741;
  * @date 2024-06-10
  */
 namespace Monitoring {
-    HalAdcEsp32 adc;
-
+    static HalAdcEsp32 adc;
     typedef int32_t Celsius;
 
     void init();
