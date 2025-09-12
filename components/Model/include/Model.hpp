@@ -7,7 +7,6 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "freertos/semphr.h"
-#include <MAX31855.hpp>
 #include <BME280.hpp>
 #include "sdkconfig.h"
 #include <stdio.h>
@@ -37,9 +36,6 @@ private:
     bool page_change = false;
 
     BME280 bme280;
-    MAX31855 thermo_tank;
-    MAX31855 thermo_meat1;
-    MAX31855 thermo_meat2;
 
     float thermo_tank_set_temp = 0.0f;
     float thermo_meat1_set_temp = 0.0f;

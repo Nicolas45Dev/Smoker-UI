@@ -9,9 +9,10 @@ namespace Monitoring
         adc.init();
     }
 
-    Celsius readTemperature_probe1() {
+    MilliCelsius readTemperature_probe1() {
         // Read the temperature from probe 1
         int adc_value = adc.readValue(T1_TEMP);
+        adc_value = filter_t1.update(adc_value);
         // Convert ADC value to Celsius using the Steinhart-Hart equation or a lookup table
         // Placeholder conversion, replace with actual calculation
         float voltage = (adc_value * ADC_VOLTAGE_REF) / ADC_MAX_VALUE; // Assuming 12-bit ADC and 3.3V reference
@@ -19,14 +20,15 @@ namespace Monitoring
         // Steinhart-Hart coefficients for a typical 1K NTC thermistor
         float lnR = log(resistance);
         float temperatureK = 1.0 / (A + B * lnR + C * lnR * lnR * lnR);
-        Celsius temperature = static_cast<Celsius>(temperatureK - 273.15); // Convert Kelvin to Celsius
+        MilliCelsius temperature = static_cast<MilliCelsius>(temperatureK - 273.15) * 1000; // Convert Kelvin to MilliCelsius
 
         return temperature;
     }
 
-    Celsius readTemperature_probe2() {
+    MilliCelsius readTemperature_probe2() {
         // Read the temperature from probe 2
-        int adc_value = adc.readValue(ADC_CHANNEL_7); // GPIO35
+        int adc_value = adc.readValue(T2_TEMP); // GPIO35
+        adc_value = filter_t2.update(adc_value);
         // Convert ADC value to Celsius using the Steinhart-Hart equation or a lookup table
         // Placeholder conversion, replace with actual calculation
         float voltage = (adc_value * ADC_VOLTAGE_REF) / ADC_MAX_VALUE; // Assuming 12-bit ADC and 3.3V reference
@@ -34,18 +36,19 @@ namespace Monitoring
         // Steinhart-Hart coefficients for a typical 1K NTC thermistor
         float lnR = log(resistance);
         float temperatureK = 1.0 / (A + B * lnR + C * lnR * lnR * lnR);
-        Celsius temperature = static_cast<Celsius>(temperatureK - 273.15); // Convert Kelvin to Celsius
+        MilliCelsius temperature = static_cast<MilliCelsius>(temperatureK - 273.15) * 1000; // Convert Kelvin to MilliCelsius
 
         return temperature;
     }
 
-    Celsius readInternalTemperature() {
+    MilliCelsius readInternalTemperature() {
         // Read the internal temperature of the ESP32
         // Placeholder implementation, replace with actual reading method
-        int adc_value = adc.readValue(ADC_CHANNEL_0); // Internal temp sensor channel
+        int adc_value = adc.readValue(TINT_TEMP); // Internal temp sensor channel
+        adc_value = filter_tint.update(adc_value);
         // Convert ADC value to Celsius using appropriate formula
         // Placeholder conversion, replace with actual calculation
-        Celsius temperature = (adc_value - 500) / 10;
+        MilliCelsius temperature = (adc_value - 500) / 10;
         return temperature;
     }
 } // namespace Monitoring

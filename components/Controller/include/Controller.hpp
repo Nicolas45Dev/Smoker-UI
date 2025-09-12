@@ -10,7 +10,6 @@
 #include <View.hpp>
 #include <stdint.h>
 #include <BME280.hpp>
-#include <MAX31855.hpp>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 

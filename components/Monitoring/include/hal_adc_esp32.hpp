@@ -22,10 +22,6 @@ public:
 private:
     adc_channel_t channel;
     adc_oneshot_unit_handle_t handle;
-
-    Filter filter_t1{Filter::computeAlpha(1.0f, 20.0f)}; // Example alpha value for the filter
-    Filter filter_t2{Filter::computeAlpha(1.0f, 20.0f)}; // Example alpha value for the filter
-    Filter filter_tint{Filter::computeAlpha(1.0f, 20.0f)}; // Example alpha value for the filter
 };
     
 #endif // HAL_ADC_ESP32_HPP

@@ -36,19 +36,16 @@ int HalAdcEsp32::readValue(adc_channel_t channel) {
             // Read the ADC value from channel 0
             ESP_ERROR_CHECK(adc_oneshot_read(handle, T1_TEMP, &adc_reading));
             adc_reading = calibrate(adc_reading, "T1_TEMP");
-            adc_reading = filter_t1.update(adc_reading);
             break;
         case T2_TEMP:
             // Read the ADC value from channel 1
             ESP_ERROR_CHECK(adc_oneshot_read(handle, T2_TEMP, &adc_reading));
             adc_reading = calibrate(adc_reading, "T2_TEMP");
-            adc_reading = filter_t2.update(adc_reading);
             break;
         case TINT_TEMP:
             // Read the ADC value from channel 2
             ESP_ERROR_CHECK(adc_oneshot_read(handle, TINT_TEMP, &adc_reading));
             adc_reading = calibrate(adc_reading, "TINT_TEMP");
-            adc_reading = filter_tint.update(adc_reading);
             break;
         default:
             break;

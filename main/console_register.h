@@ -9,8 +9,17 @@
 #include "esp_vfs_dev.h"
 #include "driver/uart.h"
 #include "esp_log.h"
+#include <inttypes.h>
 
 #define CLI_TAG "console"
+
+const char *SET_LED_CMD = "set_led";
+const char *GET_TEMP_CMD = "temp";
+const char *SET_FAN_CMD = "set_fan";
+const char *SET_MOTOR_CMD = "set_motor";
+const char *SET_RELAY_CMD = "set_relay";
+const char *ADC_RESET_CMD = "adc_reset";
+const char *ADC_CALIB_CMD = "adc_calib";
 
 // Turn the value check into a type-safe inline function (avoids macro pitfalls)
 static inline int cli_check_value_limits(int min, int max, int val) {
@@ -24,7 +33,14 @@ static inline int cli_check_value_limits(int min, int max, int val) {
 #define CLI_CHECK_VALUE_LIMITS(min, max, val) cli_check_value_limits((int)(min), (int)(max), (int)(val))
 
 #ifdef CONFIG_APP_CONSOLE_ENABLED
-// Example command: set_led <intensity> <name>
+
+/**
+ * @brief Set the LED intensity using the name and intensity value
+ * 
+ * @param argc Argument count
+ * @param argv Argument values, Should contain intensity and name
+ * @return int 0 on success, non-zero on failure
+ */
 static int cmd_set_led(int argc, char **argv)
 {
     if (argc < 3) {
@@ -41,6 +57,131 @@ static int cmd_set_led(int argc, char **argv)
     return 0;
 }
 
+/**
+ * @brief Get the temperature reading from a specified sensor
+ * 
+ * @param argc Argument count
+ * @param argv Argument values, Should contain sensor name
+ * @return int 0 on success, non-zero on failure
+ */
+static int cmd_get_temp(int argc, char **argv)
+{
+    if (argc < 2) {
+        printf("Usage: temp <sensor_name>\n");
+        return 1;
+    }
+    const char *sensor_name = argv[1];
+    ESP_LOGI("temp", "Getting temperature from sensor '%s'", sensor_name);
+    // Simulate a temperature reading
+    int32_t temperature = 2500; // Dummy value as milli-degrees Celsius
+    printf("Temperature from '%s': %" PRId32 "\n", sensor_name, temperature);
+    return 0;
+}
+
+/**
+ * @brief Set the fan speed using the name and speed value
+ * 
+ * @param argc Argument count
+ * @param argv Argument values, Should contain speed and name
+ * @return int 0 on success, non-zero on failure
+ */
+static int cmd_set_fan(int argc, char **argv)
+{
+    if (argc < 2) {
+        printf("Usage: set_fan <speed>\n");
+        return 1;
+    }
+    int speed = atoi(argv[1]);
+    uint8_t res = CLI_CHECK_VALUE_LIMITS(0, 100, speed);
+    if (res) {
+        return res;
+    }
+    ESP_LOGI("set_fan", "Setting fan speed to %d%%", speed);
+    return 0;
+}
+
+/**
+ * @brief Set the relay state using the relay number and state value
+ * 
+ * @param argc Argument count
+ * @param argv Argument values, Should contain relay number and state
+ * @return int 0 on success, non-zero on failure
+ */
+static int cmd_set_relay(int argc, char **argv)
+{
+    if (argc < 3) {
+        printf("Usage: set_relay <relay_number> <on|off>\n");
+        return 1;
+    }
+    int relay_number = atoi(argv[1]);
+    const char *state = argv[2];
+    uint8_t res = CLI_CHECK_VALUE_LIMITS(0, 10, relay_number); // Assuming max 10 relays
+    if (res) {
+        return res;
+    }
+    if (strcmp(state, "on") != 0 && strcmp(state, "off") != 0) {
+        printf("Invalid state. Use 'on' or 'off'.\n");
+        return 1;
+    }
+    ESP_LOGI("set_relay", "Setting relay %d to state '%s'", relay_number, state);
+    return 0;
+}
+
+/**
+ * @brief Set the motor speed using the name and speed value
+ * 
+ * @param argc Argument count
+ * @param argv Argument values, Should contain speed and name
+ * @return int 0 on success, non-zero on failure
+ */
+static int cmd_set_motor(int argc, char **argv)
+{
+    if (argc < 2) {
+        printf("Usage: set_motor <speed>\n");
+        return 1;
+    }
+    int speed = atoi(argv[1]);
+    uint8_t res = CLI_CHECK_VALUE_LIMITS(0, 100, speed);
+    if (res) {
+        return res;
+    }
+    ESP_LOGI("set_motor", "Setting motor speed to %d%%", speed);
+    return 0;
+}
+
+/**
+ * @brief Reset the ADC calibration data for all channels
+ * 
+ * @param argc Argument count
+ * @param argv Argument values
+ * @return int 0 on success, non-zero on failure
+ */
+static int cmd_adc_reset(int argc, char **argv)
+{
+    ESP_LOGI("adc_reset", "Resetting ADC calibration data");
+    // Implement ADC reset logic here
+    return 0;
+}
+
+/**
+ * @brief Calibrate the ADC with a given calibration value
+ * 
+ * @param argc Argument count
+ * @param argv Argument values, Should contain calibration value
+ * @return int 0 on success, non-zero on failure
+ */
+static int cmd_adc_calib(int argc, char **argv)
+{
+    if (argc < 2) {
+        printf("Usage: adc_calib <calibration_value>\n");
+        return 1;
+    }
+    int calib_value = atoi(argv[1]);
+    ESP_LOGI("adc_calib", "Calibrating ADC with value %d", calib_value);
+    // Implement ADC calibration logic here
+    return 0;
+}
+
 static void register_commands()
 {
     const esp_console_cmd_t cmd = {
@@ -50,7 +191,63 @@ static void register_commands()
         .func = &cmd_set_led,
         .argtable = NULL,
     };
+
+    const esp_console_cmd_t temperature_cmd = {
+        .command = "temp",
+        .help = "Get temperature readings <sensor_name>",
+        .hint = NULL,
+        .func = &cmd_get_temp,
+        .argtable = NULL,
+    };
+
+    const esp_console_cmd_t fan_cmd = {
+        .command = "set_fan",
+        .help = "Set fan speed. Usage: set_fan <speed 0-100>",
+        .hint = NULL,
+        .func = &cmd_set_fan,
+        .argtable = NULL,
+    };
+
+    const esp_console_cmd_t motor_cmd = {
+        .command = "set_motor",
+        .help = "Set motor speed. Usage: set_motor <speed 0-100>",
+        .hint = NULL,
+        .func = &cmd_set_motor,
+        .argtable = NULL,
+    };
+
+    const esp_console_cmd_t relay_cmd = {
+        .command = "set_relay",
+        .help = "Set relay state. Usage: set_relay <relay_number> <on|off>",
+        .hint = NULL,
+        .func = &cmd_set_relay,
+        .argtable = NULL,
+    };
+
+    const esp_console_cmd_t adc_reset_cmd = {
+        .command = "adc_reset",
+        .help = "Reset ADC calibration data",
+        .hint = NULL,
+        .func = &cmd_adc_reset,
+        .argtable = NULL,
+    };
+
+    const esp_console_cmd_t adc_calib_cmd = {
+        .command = "adc_calib",
+        .help = "Calibrate ADC. Usage: adc_calib <calibration_value>",
+        .hint = NULL,
+        .func = &cmd_adc_calib,
+        .argtable = NULL,
+    };
+
+
     ESP_ERROR_CHECK(esp_console_cmd_register(&cmd));
+    ESP_ERROR_CHECK(esp_console_cmd_register(&temperature_cmd));
+    ESP_ERROR_CHECK(esp_console_cmd_register(&fan_cmd));
+    ESP_ERROR_CHECK(esp_console_cmd_register(&motor_cmd));
+    ESP_ERROR_CHECK(esp_console_cmd_register(&relay_cmd));
+    ESP_ERROR_CHECK(esp_console_cmd_register(&adc_reset_cmd));
+    ESP_ERROR_CHECK(esp_console_cmd_register(&adc_calib_cmd));
 }
 
 // Initialize interactive console according to Kconfig (UART or USB CDC)
