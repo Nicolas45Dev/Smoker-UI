@@ -10,7 +10,7 @@
 #define PIN_CLK (gpio_num_t)36
 #define PIN_MOSI (gpio_num_t)37
 #define PIN_MISO (gpio_num_t)38
-#define CLK_SPEED 1 * 1000 * 1000
+#define CLK_SPEED 5 * 1000 * 1000
 
 #define HOST_SPI SPI3_HOST
 
@@ -29,7 +29,7 @@ private:
     gpio_num_t m_pin_clk;
     gpio_num_t m_pin_mosi;
     gpio_num_t m_pin_miso;
-    uint32_t m_clk_speed;
+        uint32_t m_clk_speed;
 
     spi_transaction_t m_transaction;
 

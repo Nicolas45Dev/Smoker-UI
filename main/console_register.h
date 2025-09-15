@@ -282,7 +282,7 @@ static void init_console()
     #endif
         .flags = 0,
     };
-    ESP_ERROR_CHECK(uart_driver_install(UART_NUM_0, 256, 0, 0, NULL, 0));
+    // ESP_ERROR_CHECK(uart_driver_install(UART_NUM_0, 256, 0, 0, NULL, 0));
     ESP_ERROR_CHECK(uart_param_config(UART_NUM_0, &uart_config));
     esp_vfs_dev_uart_use_driver(UART_NUM_0);
 

@@ -1,6 +1,8 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
+#include <stdint.h>
+
 typedef enum {
     CELSIUS_UNIT,
     FAHRENHEIT_UNIT,
@@ -38,5 +40,25 @@ typedef enum {
 #define T1_TEMP ADC_CHANNEL_3 // GPIO36
 #define T2_TEMP ADC_CHANNEL_4 // GPIO39
 #define TINT_TEMP ADC_CHANNEL_5 // GPIO34
+
+// GPIO for the MCP23017 IO expander
+namespace MCP23017Pins {
+    const uint8_t RELAY1_PIN = 43;
+    const uint8_t RELAY2_PIN = 44;
+    const uint8_t PROBE_DETECT1_PIN = 45;
+    const uint8_t PROBE_DETECT2_PIN = 46;
+    const uint8_t PROBE_DETECT3_PIN = 47;
+    const uint8_t BUZZER_PIN = 41;
+    const uint8_t EN5V_PIN = 40;
+    const uint8_t EN_MOTOR_PIN = 57;
+}
+
+// GPIO for the esp32
+namespace ESP32Pins {
+    const uint8_t ENCODER_A_PIN = 32;
+    const uint8_t MOTOR_PWM_PIN = 10;
+    const uint8_t TACHO_FAN_PIN = 8;
+    const uint8_t FAN_PWM_PIN = 7;
+}
 
 #endif // CONFIG_H

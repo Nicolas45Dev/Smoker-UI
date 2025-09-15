@@ -66,9 +66,9 @@ esp_err_t ESP32_HAL_SPI::transmit(const uint8_t* data, size_t length, uint8_t cs
     this->m_transaction.length = length * 8; // Length in bits
     this->m_transaction.tx_buffer = data;
 
-    gpio_set_level((gpio_num_t)cs_pin, 0); // Select the device
+    if (cs_pin != 255) gpio_set_level((gpio_num_t)cs_pin, 0); // Select the device
     esp_err_t ret = spi_device_transmit(this->m_spi, &this->m_transaction);
-    gpio_set_level((gpio_num_t)cs_pin, 1); // Deselect the device
+    if (cs_pin != 255) gpio_set_level((gpio_num_t)cs_pin, 1); // Deselect the device
 
     return ret;
 }
@@ -82,9 +82,9 @@ esp_err_t ESP32_HAL_SPI::receive(uint8_t* data, size_t length, uint8_t cs_pin) {
     this->m_transaction.length = length * 8; // Length in bits
     this->m_transaction.rx_buffer = data;
 
-    gpio_set_level((gpio_num_t)cs_pin, 0); // Select the device
+    if (cs_pin != 255) gpio_set_level((gpio_num_t)cs_pin, 0); // Select the device
     esp_err_t ret = spi_device_transmit(this->m_spi, &this->m_transaction);
-    gpio_set_level((gpio_num_t)cs_pin, 1); // Deselect the device
+    if (cs_pin != 255) gpio_set_level((gpio_num_t)cs_pin, 1); // Deselect the device
     return ret;
 }
 
@@ -94,9 +94,9 @@ esp_err_t ESP32_HAL_SPI::writeRead(const uint8_t* tx_data, size_t tx_length, uin
     this->m_transaction.tx_buffer = tx_data;
     this->m_transaction.rx_buffer = rx_data;
 
-    gpio_set_level((gpio_num_t)cs_pin, 0); // Select the device
+    if (cs_pin != 255) gpio_set_level((gpio_num_t)cs_pin, 0); // Select the device
     esp_err_t ret = spi_device_transmit(this->m_spi, &this->m_transaction);
-    gpio_set_level((gpio_num_t)cs_pin, 1); // Deselect the device
+    if (cs_pin != 255) gpio_set_level((gpio_num_t)cs_pin, 1); // Deselect the device
 
     return ret;
 }

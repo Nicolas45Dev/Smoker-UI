@@ -67,7 +67,7 @@ private:
     void setPageParams(bool withOption);
     void setMenuPageFromOption();
     void setMeatProfilePageFromOption();
-    void readThermocouples();
+    void readThermometers();
 
 public:
     Controller();

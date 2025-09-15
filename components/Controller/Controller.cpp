@@ -16,9 +16,9 @@ bool Controller::init() {
     memset(thermo_meat1, 0, sizeof(thermo_meat1));
     memset(thermo_meat2, 0, sizeof(thermo_meat2));
 
-    start_tick = xTaskGetTickCount();
-    thermocouple_update_tick = start_tick;
-    cooker_update_tick = start_tick;
+    // start_tick = xTaskGetTickCount();
+    // thermocouple_update_tick = start_tick;
+    // cooker_update_tick = start_tick;
 
     m_is_init = !m_is_init;
 
@@ -40,18 +40,6 @@ void Controller::run() {
     if(current_tick - start_tick >= 2000 && starting) {
         starting = false;
         model->setPageIndex(1);
-
-        readThermocouples();
-    }
-
-    if (current_tick - thermocouple_update_tick >= THERMOCOUPLE_UPDATE_INTERVAL) {
-        readThermocouples();
-        thermocouple_update_tick = current_tick;
-    }
-
-    if(current_tick - cooker_update_tick >= COOKER_INTERVAL) {
-        cooker_update_tick = current_tick;
-        cooker.cooker_work();
     }
 
     // update view
@@ -192,10 +180,10 @@ void Controller::setPageParams(bool withOption) {
     //page_params.bme280_data_press = bme280_press;
 }
 
-void Controller::readThermocouples() {
-    model->readThermocouples(thermo_tank, 0);
-    model->readThermocouples(thermo_meat1, 1);
-    model->readThermocouples(thermo_meat2, 2);
+void Controller::readThermometers() {
+    model->readThermometers(thermo_tank, 0);
+    model->readThermometers(thermo_meat1, 1);
+    model->readThermometers(thermo_meat2, 2);
 
     model->getThermoMeat1SetTemp(thermo_meat1_set);
     model->getThermoMeat2SetTemp(thermo_meat2_set);
@@ -204,7 +192,4 @@ void Controller::readThermocouples() {
         model->setThermoMeat1SetTime(time_meat_1);
         model->setThermoMeat2SetTime(time_meat_2);
     }
-
-    model->readBME280(2, bme280_hum);
-    model->readBME280(0, bme280_temp);
 }

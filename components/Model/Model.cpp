@@ -4,6 +4,7 @@ Model* Model::_instance = NULL;
 
 Model::Model()
 {
+    Monitoring::init();
 }
 
 Model::~Model() {
@@ -16,21 +17,31 @@ Model* Model::getInstance() {
     return _instance;
 }
 
-void Model::readThermocouples(char* data, uint8_t sensor_index) {
-    float temp = 0;
+void Model::readThermometers(char* data, uint8_t sensor_index) {
+    Monitoring::MilliCelsius temp = 0;
+    switch (sensor_index) {
+        case 0:
+            temp = Monitoring::readTemperature_probe1();
+            break;
+        case 1:
+            temp = Monitoring::readTemperature_probe2();
+            break;
+        case 2:
+            temp = Monitoring::readInternalTemperature();
+            break;
+        default:
+            temp = 0;
+            break;
+    }
 }
 
-float Model::readThermocouples(uint8_t sensor_index) {
+float Model::readThermometers(uint8_t sensor_index) {
     float temp = 0;
     return temp;
 }
 
-void Model::readBME280(uint8_t sensor_index, char* data) {
-    bme280.readAll();
-
-    float all_values[3] = {bme280.getTemperature(), bme280.getPressure(), bme280.getHumidity()};
-
-    sprintf(data, "%.1f", all_values[sensor_index]);
+void Model::readBME280() {
+    BME280_Device::bme280.readAll();
 }
 
 void Model::setPageChange(bool change, int8_t option_change) {

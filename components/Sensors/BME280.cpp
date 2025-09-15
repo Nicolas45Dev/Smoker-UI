@@ -1,5 +1,7 @@
 #include "BME280.hpp"
 
+using namespace BME280_Device;
+
 BME280::BME280() {
 }
 
@@ -18,13 +20,13 @@ void BME280::init() {
     io_conf.pull_up_en = GPIO_PULLUP_DISABLE;
     gpio_config(&io_conf);
 
-    gpio_set_level(BME280_CS, 1);
+    gpio_set_level(BME280_CS, 0);
 
     readCalibrationData();
 
     setCtrlMeas();
 
-    gpio_set_level(BME280_CS, 0);
+    gpio_set_level(BME280_CS, 1);
 }
 
 float BME280::getTemperature(TEMP_UNIT unit) {
@@ -40,7 +42,7 @@ float BME280::getTemperature(TEMP_UNIT unit) {
         default:
             return temperature;
     }
-    return new_temperature;
+        return new_temperature;
 }
 
 float BME280::getPressure(PERSSURE_UNIT unit) {
@@ -114,28 +116,6 @@ void BME280::readCalibrationData() {
 
     press = (rx_buffer[24] << 8) | rx_buffer[23];
     dig_P9 = (int16_t)press;
-
-    uint8_t spi_byte2 = BME280_CALIB_HUM_1_REG;
-    tx_buffer[0] = setBit(true, spi_byte2);
-    spi->writeRead(tx_buffer, 2, rx_buffer, 2, BME280_CS);
-
-    dig_H1 = rx_buffer[1];
-
-    spi_byte2 = BME280_CALIB_HUM_2_REG;
-    tx_buffer[0] = setBit(true, spi_byte2);
-    spi->writeRead(tx_buffer, 8, rx_buffer, 8, BME280_CS);
-
-    dig_H2 = (int16_t)((rx_buffer[2] << 8) | rx_buffer[1]);
-    dig_H3 = rx_buffer[3];
-
-    dig_H4 = (int16_t)((rx_buffer[4] << 4) | (rx_buffer[5] & 0x0F));
-    if (dig_H4 & 0x0800) dig_H4 |= 0xF000; // Étendre le signe si négatif
-
-    dig_H5 = (int16_t)((rx_buffer[6] << 4) | ((rx_buffer[5] >> 4) & 0x0F));
-    if (dig_H5 & 0x0800) dig_H5 |= 0xF000; // Étendre le signe si négatif
-
-    dig_H6 = (int8_t)rx_buffer[7];
-
 }
 
 void BME280::readTemperature() {
@@ -254,5 +234,4 @@ void BME280::setConfig() {
 void BME280::readAll() {
     readTemperature();
     readPressure();
-    readHumidity();
 }

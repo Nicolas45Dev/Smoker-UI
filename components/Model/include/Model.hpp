@@ -8,20 +8,11 @@
 #include "freertos/task.h"
 #include "freertos/semphr.h"
 #include <BME280.hpp>
+#include "Monitoring.hpp"
 #include "sdkconfig.h"
 #include <stdio.h>
 #include <stdint.h>
 #include <string.h>
-
-#ifdef CONFIG_SENSOR_TYPE_THERMOCOUPLE
-#define THERMO_TANK_CS (gpio_num_t)CONFIG_THERMOCOUPLE_TANK_SPI_CS
-#define THERMO_MEAT1_CS (gpio_num_t)CONFIG_THERMOCOUPLE_MEAT1_SPI_CS
-#define THERMO_MEAT2_CS (gpio_num_t)CONFIG_THERMOCOUPLE_MEAT2_SPI_CS
-
-#define THERMO_TANK_ACTIVE_LED (gpio_num_t)8
-#define THERMO_MEAT1_ACTIVE_LED (gpio_num_t)10
-#define THERMO_MEAT2_ACTIVE_LED (gpio_num_t)9
-#endif
 
 /**
  * @brief This class represents the model of the MVC pattern
@@ -34,8 +25,6 @@ private:
     uint8_t page_option = 0;
 
     bool page_change = false;
-
-    BME280 bme280;
 
     float thermo_tank_set_temp = 0.0f;
     float thermo_meat1_set_temp = 0.0f;
@@ -59,8 +48,8 @@ public:
 
     static Model* getInstance();
 
-    void readThermocouples(char* data, uint8_t sensor_index);
-    void readBME280(uint8_t sensor_index, char* data);
+    void readThermometers(char* data, uint8_t sensor_index);
+    void readBME280();
     float getThermoTankSetTemp() { return thermo_tank_set_temp; }
 
     void getThermoMeat1SetTemp(char* data);
@@ -69,7 +58,7 @@ public:
     uint8_t getPageOption() { return page_option; }
     uint32_t getThermoRemindTime(uint8_t sensor_index);
 
-    float readThermocouples(uint8_t sensor_index);
+    float readThermometers(uint8_t sensor_index);
     void reset();
     void setThermoTankSetTemp(float temp) { thermo_tank_set_temp = temp; }
     void setThermoMeat1SetTime(char* time);

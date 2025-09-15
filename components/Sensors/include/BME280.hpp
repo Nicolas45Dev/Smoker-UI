@@ -11,7 +11,7 @@
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 
-#define BME280_CS (gpio_num_t)18
+#define BME280_CS (gpio_num_t)35
 
 #define BME280_HUM_LSB_REG 0xFE
 #define BME280_HUM_MSB_REG 0xFD
@@ -40,71 +40,76 @@
 
 #define BME280_ADDRESS 0x76
 
-class BME280
-{
-private:
-    SPI* spi;
+namespace BME280_Device {
+    class BME280
+    {
+    private:
+        SPI* spi;
 
-    uint16_t dig_T1;
-    int16_t dig_T2;
-    int16_t dig_T3;
-    uint16_t dig_P1;
-    int16_t dig_P2;
-    int16_t dig_P3;
-    int16_t dig_P4;
-    int16_t dig_P5;
-    int16_t dig_P6;
-    int16_t dig_P7;
-    int16_t dig_P8;
-    int16_t dig_P9;
-    uint8_t dig_H1;
-    int16_t dig_H2;
-    uint8_t dig_H3;
-    int16_t dig_H4;
-    int16_t dig_H5;
-    int8_t dig_H6;
+        uint16_t dig_T1;
+        int16_t dig_T2;
+        int16_t dig_T3;
+        uint16_t dig_P1;
+        int16_t dig_P2;
+        int16_t dig_P3;
+        int16_t dig_P4;
+        int16_t dig_P5;
+        int16_t dig_P6;
+        int16_t dig_P7;
+        int16_t dig_P8;
+        int16_t dig_P9;
+        uint8_t dig_H1;
+        int16_t dig_H2;
+        uint8_t dig_H3;
+        int16_t dig_H4;
+        int16_t dig_H5;
+        int8_t dig_H6;
 
-    float temperature;
-    float pressure;
-    float humidity;
-    uint32_t t_fine;
+        float temperature;
+        float pressure;
+        float humidity;
+        uint32_t t_fine;
 
-    void readTemperature();
-    void readPressure();
-    void readHumidity();
-    void readCalibrationData();
-    uint8_t setBit(bool read, uint8_t reg);
-    void setCtrlMeas();
-    void setCtrlHum();
-    void setConfig();
-public:
-    BME280();
-    ~BME280();
+        void readTemperature();
+        void readPressure();
+        void readHumidity();
+        void readCalibrationData();
+        uint8_t setBit(bool read, uint8_t reg);
+        void setCtrlMeas();
+        void setCtrlHum();
+        void setConfig();
+    public:
+        BME280();
+        ~BME280();
 
-    void init();
+        void init();
 
-    /**
-     * @brief Get the Temperature object
-     * 
-     * @return float 
-     */
-    float getTemperature(TEMP_UNIT unit = DEFAULT_UNIT);
+        /**
+         * @brief Get the Temperature object
+         * 
+         * @return float 
+         */
+        float getTemperature(TEMP_UNIT unit = DEFAULT_UNIT);
 
-    /**
-     * @brief Get the Pressure object
-     * 
-     * @return float 
-     */
-    float getPressure(PERSSURE_UNIT unit = DEFAULT_PRESSURE_UNIT);
+        /**
+         * @brief Get the Pressure object
+         * 
+         * @return float 
+         */
+        float getPressure(PERSSURE_UNIT unit = DEFAULT_PRESSURE_UNIT);
 
-    /**
-     * @brief Get the Humidity object
-     * 
-     * @return float 
-     */
-    float getHumidity();
+        /**
+         * @brief Get the Humidity object
+         * 
+         * @return float 
+         */
+        float getHumidity();
 
-    void readAll();
-};
+        void readAll();
+    };
+
+    static BME280 bme280;
+
+} // namespace BME280_Device
 
 #endif // BME280_HPP
