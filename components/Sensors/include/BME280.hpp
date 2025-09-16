@@ -5,6 +5,7 @@
 #include <driver/gpio.h>
 #include <driver/spi_master.h>
 #include <esp_log.h>
+#include <Monitoring.hpp>
 #include <stdint.h>
 #include <string.h>
 #include <SPI.hpp>
@@ -58,25 +59,16 @@ namespace BME280_Device {
         int16_t dig_P7;
         int16_t dig_P8;
         int16_t dig_P9;
-        uint8_t dig_H1;
-        int16_t dig_H2;
-        uint8_t dig_H3;
-        int16_t dig_H4;
-        int16_t dig_H5;
-        int8_t dig_H6;
 
         float temperature;
         float pressure;
-        float humidity;
         uint32_t t_fine;
 
         void readTemperature();
         void readPressure();
-        void readHumidity();
         void readCalibrationData();
         uint8_t setBit(bool read, uint8_t reg);
         void setCtrlMeas();
-        void setCtrlHum();
         void setConfig();
     public:
         BME280();
@@ -89,7 +81,7 @@ namespace BME280_Device {
          * 
          * @return float 
          */
-        float getTemperature(TEMP_UNIT unit = DEFAULT_UNIT);
+        Monitoring::MilliCelsius getTemperature(TEMP_UNIT unit = DEFAULT_UNIT);
 
         /**
          * @brief Get the Pressure object
@@ -97,13 +89,6 @@ namespace BME280_Device {
          * @return float 
          */
         float getPressure(PERSSURE_UNIT unit = DEFAULT_PRESSURE_UNIT);
-
-        /**
-         * @brief Get the Humidity object
-         * 
-         * @return float 
-         */
-        float getHumidity();
 
         void readAll();
     };

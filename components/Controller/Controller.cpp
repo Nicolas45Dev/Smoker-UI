@@ -16,9 +16,8 @@ bool Controller::init() {
     memset(thermo_meat1, 0, sizeof(thermo_meat1));
     memset(thermo_meat2, 0, sizeof(thermo_meat2));
 
-    // start_tick = xTaskGetTickCount();
-    // thermocouple_update_tick = start_tick;
-    // cooker_update_tick = start_tick;
+    page_index = 0;
+    start_tick = xTaskGetTickCount();
 
     m_is_init = !m_is_init;
 
@@ -37,21 +36,21 @@ void Controller::run() {
         setPageChange();
     }
 
-    if(current_tick - start_tick >= 2000 && starting) {
-        starting = false;
-        model->setPageIndex(1);
+    // Let the system init for 2 seconds
+    if (current_tick < (start_tick + 2000)) {
+        page_index = 1;
     }
 
-    // update view
-    updateView();
+    // Update the view every 5 ticks
+    if (current_tick % 5 == 0) {
+        updateView();
+    }
 }
 
 void Controller::updateView() {
-    setPageParams(model->getPageIndex() >= 1);
-    if(!is_active) {
-        model->setPageIndex(5);
-    }
-    switch (model->getPageIndex())
+    setPageParams(page_index >= 1);
+
+    switch (page_index)
     {
         case 0:
             view.drawLogoPage();
@@ -87,13 +86,13 @@ void Controller::updateModel() {
 
 void Controller::setPageChange() {
     if(current_tick > (previous_tick + 200)) {
-        switch (model->getPageIndex())
+        switch (page_index)
         {
         case 0:
-            model->setPageIndex(1);
+            page_index = 1;
             break;
         case 1:
-            model->setPageIndex(2);
+            page_index = 2;
             break;
         case 2:
             setMenuPageFromOption();
@@ -102,7 +101,7 @@ void Controller::setPageChange() {
             setMeatProfilePageFromOption();
             break;
         default:
-            model->setPageIndex(1);
+            page_index = 1;
             break;
         }
 
@@ -116,19 +115,19 @@ void Controller::setMenuPageFromOption() {
     switch (option_change)
     {
     case 0:
-        model->setPageIndex(3);
+        page_index = 3;
         break;
     case 1:
-        model->setPageIndex(4);
+        page_index = 4;
         break;
     case 2: // Close fire
         cooker.set_active(false);
         cooker.set_target_temp(0);
         model->reset();
-        model->setPageIndex(1);
+        page_index = 1;
         break;
     default:
-        model->setPageIndex(1);
+        page_index = 1;
         break;
     }
 }
@@ -137,7 +136,7 @@ void Controller::setMeatProfilePageFromOption() {
     switch (option_change)
     {
     case 10:
-        model->setPageIndex(2);
+        page_index = 2;
         break;
     default:
         // set meat profile
@@ -145,7 +144,7 @@ void Controller::setMeatProfilePageFromOption() {
         model->setThermoMeat1SetTemp(view.getMeatProfileData(option_change).meat_temp);
         model->setThermoMeat2SetTemp(view.getMeatProfileData(option_change).meat_temp);
 
-        model->setPageIndex(1);
+        page_index = 1; // Go back to main page
 
         cooker.set_active(true);
         cooker.set_target_temp(view.getMeatProfileData(option_change).tank_temp);
@@ -176,20 +175,29 @@ void Controller::setPageParams(bool withOption) {
     page_params.time_meat2 = time_meat_2;
     page_params.selected_option = withOption ? option_change : 0;
     page_params.bme280_data_temp = bme280_temp;
-    page_params.bme280_data_hum = bme280_hum;
-    //page_params.bme280_data_press = bme280_press;
+    page_params.bme280_data_press = bme280_press;
 }
 
-void Controller::readThermometers() {
-    model->readThermometers(thermo_tank, 0);
-    model->readThermometers(thermo_meat1, 1);
-    model->readThermometers(thermo_meat2, 2);
+void Controller::updateFromModel() {
+    Monitoring::MilliCelsius temp1 = model->readThermometers(0);
+    Monitoring::MilliCelsius temp2 = model->readThermometers(1);
+    Monitoring::MilliCelsius temp3 = model->readThermometers(2);
 
-    model->getThermoMeat1SetTemp(thermo_meat1_set);
-    model->getThermoMeat2SetTemp(thermo_meat2_set);
-    
-    if(cooker.get_active()) {
-        model->setThermoMeat1SetTime(time_meat_1);
-        model->setThermoMeat2SetTime(time_meat_2);
+    // Put the temperature in the char array
+    sprintf(thermo_tank, "%.1fC", temp3 / 1000.0f);
+    sprintf(thermo_meat1, "%.1fC", temp1 / 1000.0f);
+    sprintf(thermo_meat2, "%.1fC", temp2 / 1000.0f);
+
+    // Read BME280 data
+    model->readBME280();
+    float bme_temp = model->getBME280Temperature();
+    float bme_press = model->getBME280Pressure();
+
+    if (bme_temp == 273000.0f) {
+        sprintf(bme280_temp, "----");
+    } else {
+        sprintf(bme280_temp, "%.1fC", bme_temp);
     }
+
+    sprintf(bme280_press, "%.1f", bme_press);
 }

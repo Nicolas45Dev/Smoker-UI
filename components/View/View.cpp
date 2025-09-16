@@ -46,28 +46,31 @@ void View::drawMainPage(page_params_t &page_params)
     char buffer_t1[10];
 
     u8g2_ClearBuffer(&u8g2);
-    u8g2_DrawBitmap(&u8g2, 0, 10, 10, 46, tank);
+    u8g2_DrawBitmap(&u8g2, 0, 10, 10, 40, tank);
 
     u8g2_SetFont(&u8g2, u8g2_font_tinytim_tr);
-    u8g2_DrawStr(&u8g2, 32, 7, "Smoker");
+    u8g2_DrawStr(&u8g2, 24, 7, "Smoker");
 
     // String for temperature tank
-    u8g2_DrawStr(&u8g2, 28, 32, page_params.temp_tank1);
-    u8g2_DrawStr(&u8g2, 50, 32, "C");
+    u8g2_DrawStr(&u8g2, 22, 32, page_params.temp_tank1);
+    u8g2_DrawStr(&u8g2, 44, 32, "C");
 
     u8g2_DrawLine(&u8g2, 26, 34, 56, 34);
 
     // Write the target temperature for the tank under the current temperature
     sprintf(buffer_t1, "%.1f", page_params.set_temp_tank);
-    u8g2_DrawStr(&u8g2, 28, 42, buffer_t1);
-    u8g2_DrawStr(&u8g2, 50, 42, "C");
+    u8g2_DrawStr(&u8g2, 22, 42, buffer_t1);
+    u8g2_DrawStr(&u8g2, 44, 42, "C");
 
     if(page_params.selected_option == 0) {
 
-        u8g2_DrawBitmap(&u8g2, 82, 12, 1, 8, thermometer);
-        u8g2_DrawBitmap(&u8g2, 82, 36, 1, 8, thermometer);
-        u8g2_DrawBitmap(&u8g2, 82, 24, 1, 8, time_icon);
-        u8g2_DrawBitmap(&u8g2, 82, 48, 1, 8, time_icon);
+        u8g2_DrawBitmap(&u8g2, 76, 12, 1, 8, thermometer);
+        u8g2_DrawBitmap(&u8g2, 76, 36, 1, 8, thermometer);
+        u8g2_DrawBitmap(&u8g2, 76, 24, 1, 8, time_icon);
+        u8g2_DrawBitmap(&u8g2, 76, 48, 1, 8, time_icon);
+
+        u8g2_DrawHLine(&u8g2, 76, 4, 12);
+        u8g2_DrawHLine(&u8g2, 76, 5, 12);
 
         if(index < 60) {
             // String for temperature 1
@@ -90,13 +93,16 @@ void View::drawMainPage(page_params_t &page_params)
         u8g2_DrawStr(&u8g2, 92, 55, page_params.time_meat2);
     }
     else {
-        u8g2_DrawBitmap(&u8g2, 82, 12, 1, 8, thermometer);
-        u8g2_DrawBitmap(&u8g2, 82, 24, 1, 8, thermometer);
+        u8g2_DrawHLine(&u8g2, 88, 4, 12);
+        u8g2_DrawHLine(&u8g2, 88, 5, 12);
+
+        u8g2_DrawBitmap(&u8g2, 76, 12, 1, 8, thermometer);
+        u8g2_DrawBitmap(&u8g2, 76, 24, 1, 8, thermometer);
 
         // String for bme temperature
         u8g2_DrawStr(&u8g2, 92, 19, page_params.bme280_data_temp);
         // String for bme humidity
-        u8g2_DrawStr(&u8g2, 92, 31, page_params.bme280_data_hum);
+        u8g2_DrawStr(&u8g2, 92, 31, page_params.bme280_data_press);
     }
 
     index++;

@@ -5,6 +5,7 @@ Model* Model::_instance = NULL;
 Model::Model()
 {
     Monitoring::init();
+    bme280.init();
 }
 
 Model::~Model() {
@@ -17,36 +18,27 @@ Model* Model::getInstance() {
     return _instance;
 }
 
-void Model::readThermometers(char* data, uint8_t sensor_index) {
+Monitoring::MilliCelsius Model::readThermometers(uint8_t sensor_index) {
     Monitoring::MilliCelsius temp = 0;
     switch (sensor_index) {
         case 0:
-            temp = Monitoring::readTemperature_probe1();
+            temp = temperature_t1;
             break;
         case 1:
-            temp = Monitoring::readTemperature_probe2();
+            temp = temperature_t2;
             break;
         case 2:
-            temp = Monitoring::readInternalTemperature();
+            temp = temperature_tint;
             break;
         default:
-            temp = 0;
+            temp = DEFAULT_SET_TEMP; // Error value
             break;
     }
-}
-
-float Model::readThermometers(uint8_t sensor_index) {
-    float temp = 0;
     return temp;
 }
 
 void Model::readBME280() {
     BME280_Device::bme280.readAll();
-}
-
-void Model::setPageChange(bool change, int8_t option_change) {
-    //page_change = change;
-    page_index++;
 }
 
 void Model::getThermoMeat1SetTemp(char* data) {
@@ -70,7 +62,25 @@ void Model::setThermoMeat2SetTime(char* time) {
 }
 
 void Model::reset() {
-    thermo_tank_set_temp = 0.0f;
-    thermo_remind_time_1 = 0.0f;
-    thermo_remind_time_2 = 0.0f;
+}
+
+void Model::update() {
+    Monitoring::readTemperature_probe1();
+    Monitoring::readTemperature_probe2();
+    Monitoring::readInternalTemperature();
+
+    if (bme280_tick >= BME280_UPDATE_PERIOD_TICK) {
+        bme280.readAll();
+        temperature_average.addValue(bme280.getTemperature());
+        bme280_tick = 0;
+    }
+
+    bme280_tick++;
+}
+
+float Model::getBME280Temperature() {
+    if (temperature_average.isFull()) {
+        return temperature_average.getAverage() / 100.0f;
+    }
+    return 273000.0f; // Return absolute zero if not enough data
 }

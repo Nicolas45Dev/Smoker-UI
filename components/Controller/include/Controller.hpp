@@ -6,6 +6,7 @@
 #include <esp_log.h>
 #include "Encoder.hpp"
 #include <Model.hpp>
+#include <Monitoring.hpp>
 #include <stdio.h>
 #include <View.hpp>
 #include <stdint.h>
@@ -54,7 +55,6 @@ private:
     float previous_thermo_2;
 
     char bme280_temp[5];
-    char bme280_hum[5];
     char bme280_press[6];
 
     View view;
@@ -67,7 +67,7 @@ private:
     void setPageParams(bool withOption);
     void setMenuPageFromOption();
     void setMeatProfilePageFromOption();
-    void readThermometers();
+    void updateFromModel();
 
 public:
     Controller();

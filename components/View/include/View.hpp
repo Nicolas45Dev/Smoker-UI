@@ -26,7 +26,7 @@ typedef struct {
     char* time_meat1;
     char* time_meat2;
     char* bme280_data_temp;
-    char* bme280_data_hum;
+    char* bme280_data_press;
     uint8_t selected_option;
 } page_params_t;
 

@@ -29,18 +29,18 @@ void BME280::init() {
     gpio_set_level(BME280_CS, 1);
 }
 
-float BME280::getTemperature(TEMP_UNIT unit) {
-    float new_temperature = 0;
+Monitoring::MilliCelsius BME280::getTemperature(TEMP_UNIT unit) {
+    Monitoring::MilliCelsius new_temperature = 0;
 
     switch(unit) {
         case FAHRENHEIT_UNIT:
-            new_temperature = CELSIUS_TO_FAHRENHEIT(temperature);
+            new_temperature = (Monitoring::MilliCelsius)(CELSIUS_TO_FAHRENHEIT(temperature) * 100);
             break;
         case KELVIN_UNIT:
-            new_temperature = CELSIUS_TO_KELVIN(temperature);
+            new_temperature = (Monitoring::MilliCelsius)(CELSIUS_TO_KELVIN(temperature) * 100);
             break;
         default:
-            return temperature;
+            return (Monitoring::MilliCelsius)temperature * 100;
     }
         return new_temperature;
 }
@@ -66,10 +66,6 @@ float BME280::getPressure(PERSSURE_UNIT unit) {
     }
 
     return new_pressure;
-}
-
-float BME280::getHumidity() {
-    return humidity;
 }
 
 void BME280::readCalibrationData() {
@@ -166,37 +162,6 @@ void BME280::readPressure() {
     pressure = (float)p / 256.0;
 }
 
-void BME280::readHumidity() {
-    uint8_t spi_byte = BME280_HUM_MSB_REG;
-    uint8_t tx_buffer[3] = {0, 0, 0};
-    tx_buffer[0] = setBit(true, spi_byte);
-    uint8_t rx_buffer[4];
-
-    spi->writeRead(tx_buffer, 3, rx_buffer, 3, BME280_CS);
-
-    uint32_t adc_H = (rx_buffer[1] << 8) | rx_buffer[2];
-
-    int32_t var1, var2, var3, var4, var5;
-
-    var1 = t_fine - (int32_t)76800;
-    var2 = (int32_t)(adc_H * 16384);
-    var3 = (int32_t)(((int32_t)dig_H4) * 1048576);
-    var4 = ((int32_t)dig_H5) * var1;
-    var5 = (((var2 - var3) - var4) + (int32_t)16384) / 32768;
-    var2 = (var1 * ((int32_t)dig_H6)) / 1024;
-    var3 = (var1 * ((int32_t)dig_H3)) / 2048;
-    var4 = ((var2 * (var3 + (int32_t)32768)) / 1024) + (int32_t)2097152;
-    var2 = ((var4 * ((int32_t)dig_H2)) + 8192) / 16384;
-    var3 = var5 * var2;
-    var4 = ((var3 / 32768) * (var3 / 32768)) / 128;
-    var5 = var3 - ((var4 * ((int32_t)dig_H1)) / 16);
-    var5 = var5 < 0 ? 0 : var5;
-    var5 = var5 > 419430400 ? 419430400 : var5;
-    uint32_t h = (uint32_t)(var5 / 4096);
-
-    humidity = (float)h / 1024.0;
-}
-
 uint8_t BME280::setBit(bool read, uint8_t reg) {
     // If read is true, set the first bit to 1
     if(read) {
@@ -212,14 +177,6 @@ void BME280::setCtrlMeas() {
     uint8_t tx_buffer[2] = {0, 0};
     tx_buffer[0] = setBit(false, spi_byte);
     tx_buffer[1] = 0x27;
-    spi->write(tx_buffer, 2, BME280_CS);
-}
-
-void BME280::setCtrlHum() {
-    uint8_t spi_byte = BME280_CTRL_HUM_REG;
-    uint8_t tx_buffer[2] = {0, 0};
-    tx_buffer[0] = setBit(false, spi_byte);
-    tx_buffer[1] = 0x01;
     spi->write(tx_buffer, 2, BME280_CS);
 }
 

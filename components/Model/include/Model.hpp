@@ -9,10 +9,16 @@
 #include "freertos/semphr.h"
 #include <BME280.hpp>
 #include "Monitoring.hpp"
+#include "mobileAverage.hpp"
 #include "sdkconfig.h"
 #include <stdio.h>
 #include <stdint.h>
 #include <string.h>
+
+
+static const char* TAG = "MODEL";
+const int BME280_UPDATE_PERIOD_TICK = 50 * 2; // Update BME280 every 2 seconds with 50 ms tick
+const Monitoring::MilliCelsius DEFAULT_SET_TEMP = 2500; // Default set temperature in MilliCelsius (22.5°C)
 
 /**
  * @brief This class represents the model of the MVC pattern
@@ -24,18 +30,20 @@ private:
     uint8_t page_index = 0;
     uint8_t page_option = 0;
 
+    uint32_t bme280_tick = 0;
+
     bool page_change = false;
 
-    float thermo_tank_set_temp = 0.0f;
-    float thermo_meat1_set_temp = 0.0f;
-    float thermo_meat2_set_temp = 0.0f;
-    float previous_thermo_temp_1 = 0.0f;
-    float previous_thermo_temp_2 = 0.0f;
-    float thermo_remind_time_1, thermo_remind_time_2;
+    Monitoring::MilliCelsius temperature_t1 = 0;
+    Monitoring::MilliCelsius temperature_t2 = 0;
+    Monitoring::MilliCelsius temperature_tint = 0;
 
     TEMP_UNIT user_unit = DEFAULT_UNIT;
 
-    SemaphoreHandle_t _mutex = NULL;
+    BME280_Device::BME280 bme280 = BME280_Device::BME280();
+
+    FIR::MobileAverage::MobileAverage<Monitoring::MilliCelsius, 5> temperature_average;
+
     static Model* _instance;
 
 protected:
@@ -48,9 +56,10 @@ public:
 
     static Model* getInstance();
 
-    void readThermometers(char* data, uint8_t sensor_index);
     void readBME280();
-    float getThermoTankSetTemp() { return thermo_tank_set_temp; }
+    float getBME280Temperature();
+    float getBME280Pressure();
+    float getThermoTankSetTemp() { return 0.0f; }
 
     void getThermoMeat1SetTemp(char* data);
     void getThermoMeat2SetTemp(char* data);
@@ -58,15 +67,20 @@ public:
     uint8_t getPageOption() { return page_option; }
     uint32_t getThermoRemindTime(uint8_t sensor_index);
 
-    float readThermometers(uint8_t sensor_index);
+    Monitoring::MilliCelsius readThermometers(uint8_t sensor_index);
     void reset();
-    void setThermoTankSetTemp(float temp) { thermo_tank_set_temp = temp; }
+    void setThermoTankSetTemp(float temp) { return; }
     void setThermoMeat1SetTime(char* time);
     void setThermoMeat2SetTime(char* time);
-    void setThermoMeat1SetTemp(float temp) { thermo_meat1_set_temp = temp; }
-    void setThermoMeat2SetTemp(float temp) { thermo_meat2_set_temp = temp; }
-    void setPageChange(bool change, int8_t option_change = 0);
-    void setPageIndex(uint8_t index) { page_index = index; }
+    void setThermoMeat1SetTemp(float temp) { return; }
+    void setThermoMeat2SetTemp(float temp) { return; }
+
+    /**
+     * @brief Reads all the sensors and updates the data
+     * ! This function should be called periodically
+     * @note The function has a slower tick to update the BME280 sensor
+     */
+    void update();
 };
 
 #endif // MODEL_HPP
