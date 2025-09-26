@@ -2,6 +2,7 @@
 #define CONFIG_H
 
 #include <stdint.h>
+#include "sdkconfig.h"
 
 typedef enum {
     CELSIUS_UNIT,

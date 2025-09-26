@@ -4,12 +4,22 @@
 #include <driver/gpio.h>
 #include "SPI.hpp"
 #include <stdint.h>
+#include "sdkconfig.h"
 
 #define MCP23017_ADDRESS 0x00
 #define OPCODE 0x40
 
-const uint8_t CS_PIN = 39;
-const uint8_t RESET_PIN = 18;
+#ifdef CONFIG_MCP23017_CS_GPIO
+constexpr gpio_num_t CS_PIN = static_cast<gpio_num_t>(CONFIG_MCP23017_CS_GPIO);
+#else
+constexpr gpio_num_t CS_PIN = GPIO_NUM_39;
+#endif
+
+#ifdef CONFIG_MCP23017_RESET_GPIO
+constexpr gpio_num_t RESET_PIN = static_cast<gpio_num_t>(CONFIG_MCP23017_RESET_GPIO);
+#else
+constexpr gpio_num_t RESET_PIN = GPIO_NUM_18;
+#endif
 
 // MCP23017 Register Addresses
 #define IODIRA   0x00

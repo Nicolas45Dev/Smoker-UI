@@ -82,5 +82,7 @@ float Model::getBME280Temperature() {
     if (temperature_average.isFull()) {
         return temperature_average.getAverage() / 100.0f;
     }
+    int state = GPIO::digitalRead(MCP23017Pins::PROBE_DETECT1_PIN); // Dummy read to avoid unused function warning
+    
     return 273000.0f; // Return absolute zero if not enough data
 }

@@ -1,3 +1,3 @@
 idf_component_register(SRCS "Motor.cpp"
                     INCLUDE_DIRS "include"
-                    REQUIRES driver esp_driver_ledc esp_driver_gpio GPIO)
+                    REQUIRES driver GPIO config)

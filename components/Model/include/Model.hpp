@@ -8,6 +8,7 @@
 #include "freertos/task.h"
 #include "freertos/semphr.h"
 #include <BME280.hpp>
+#include "GPIO.hpp"
 #include "Monitoring.hpp"
 #include "mobileAverage.hpp"
 #include "sdkconfig.h"
@@ -16,7 +17,7 @@
 #include <string.h>
 
 
-static const char* TAG = "MODEL";
+static const char* MODEL_TAG = "MODEL";
 const int BME280_UPDATE_PERIOD_TICK = 50 * 2; // Update BME280 every 2 seconds with 50 ms tick
 const Monitoring::MilliCelsius DEFAULT_SET_TEMP = 2500; // Default set temperature in MilliCelsius (22.5°C)
 
@@ -74,6 +75,10 @@ public:
     void setThermoMeat2SetTime(char* time);
     void setThermoMeat1SetTemp(float temp) { return; }
     void setThermoMeat2SetTemp(float temp) { return; }
+
+    bool isProbe1Connected() { return GPIO::digitalRead(MCP23017Pins::PROBE_DETECT1_PIN) == 1; }
+    bool isProbe2Connected() { return GPIO::digitalRead(MCP23017Pins::PROBE_DETECT2_PIN) == 1; }
+    bool isProbe3Connected() { return GPIO::digitalRead(MCP23017Pins::PROBE_DETECT3_PIN) == 1; }
 
     /**
      * @brief Reads all the sensors and updates the data

@@ -28,7 +28,7 @@ menu "Smoker configuration"
     menu "Settings for motor and fan"
         config MOTOR_PIN_DIRECTION
             int "Motor pin"
-            default 11
+            default 57
             help
                 The pin to use for the motor.
         

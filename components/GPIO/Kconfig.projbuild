@@ -1,0 +1,20 @@
+menu "MCP23017 GPIO configuration"
+
+    config MCP23017_CS_GPIO
+        int "MCP23017 chip-select GPIO"
+        range 0 48
+        default 39
+        help
+            GPIO number used to drive the CS pin of the MCP23017/MCP23S17 expander.
+            Pick a pad that supports output mode and is not shared with the ADC or other peripherals.
+
+    config MCP23017_RESET_GPIO
+        int "MCP23017 reset GPIO"
+        range 0 48
+        default 18
+        help
+            GPIO number connected to the expander reset input. Select a valid
+            output-capable GPIO or keep the default value if the reset pin is
+            wired only to the ESP32.
+
+endmenu

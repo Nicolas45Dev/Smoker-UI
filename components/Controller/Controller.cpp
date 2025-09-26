@@ -25,7 +25,7 @@ bool Controller::init() {
 }
 
 void Controller::run() {
-    current_tick = xTaskGetTickCount();
+    current_tick++;
 
     // Check the encoder inputs
     if (Encoder::isOptionChanged()) {
@@ -37,9 +37,11 @@ void Controller::run() {
     }
 
     // Let the system init for 2 seconds
-    if (current_tick < (start_tick + 2000)) {
+    if (current_tick > 20) {
         page_index = 1;
     }
+
+    updateFromModel();
 
     // Update the view every 5 ticks
     if (current_tick % 5 == 0) {
@@ -121,8 +123,6 @@ void Controller::setMenuPageFromOption() {
         page_index = 4;
         break;
     case 2: // Close fire
-        cooker.set_active(false);
-        cooker.set_target_temp(0);
         model->reset();
         page_index = 1;
         break;
@@ -145,9 +145,6 @@ void Controller::setMeatProfilePageFromOption() {
         model->setThermoMeat2SetTemp(view.getMeatProfileData(option_change).meat_temp);
 
         page_index = 1; // Go back to main page
-
-        cooker.set_active(true);
-        cooker.set_target_temp(view.getMeatProfileData(option_change).tank_temp);
 
         break;
     }
@@ -184,20 +181,18 @@ void Controller::updateFromModel() {
     Monitoring::MilliCelsius temp3 = model->readThermometers(2);
 
     // Put the temperature in the char array
-    sprintf(thermo_tank, "%.1fC", temp3 / 1000.0f);
-    sprintf(thermo_meat1, "%.1fC", temp1 / 1000.0f);
-    sprintf(thermo_meat2, "%.1fC", temp2 / 1000.0f);
+    if (model->isProbe1Connected()) {
+        sprintf(thermo_tank, "%.1f", temp1 / 100.0f);
+    } else {
+        sprintf(thermo_tank, "----");
+    }
 
     // Read BME280 data
-    model->readBME280();
     float bme_temp = model->getBME280Temperature();
-    float bme_press = model->getBME280Pressure();
 
     if (bme_temp == 273000.0f) {
         sprintf(bme280_temp, "----");
     } else {
         sprintf(bme280_temp, "%.1fC", bme_temp);
     }
-
-    sprintf(bme280_press, "%.1f", bme_press);
 }

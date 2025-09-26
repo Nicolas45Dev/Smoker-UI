@@ -42,7 +42,8 @@ Monitoring::MilliCelsius BME280::getTemperature(TEMP_UNIT unit) {
         default:
             return (Monitoring::MilliCelsius)temperature * 100;
     }
-        return new_temperature;
+
+    return new_temperature;
 }
 
 float BME280::getPressure(PERSSURE_UNIT unit) {
