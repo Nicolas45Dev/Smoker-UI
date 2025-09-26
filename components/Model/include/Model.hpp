@@ -34,10 +34,12 @@ private:
     uint32_t bme280_tick = 0;
 
     bool page_change = false;
+    bool cooker_state = false;
 
     Monitoring::MilliCelsius temperature_t1 = 0;
     Monitoring::MilliCelsius temperature_t2 = 0;
     Monitoring::MilliCelsius temperature_tint = 0;
+    Monitoring::MilliCelsius target_temperature_int = 0;
 
     TEMP_UNIT user_unit = DEFAULT_UNIT;
 
@@ -59,8 +61,7 @@ public:
 
     void readBME280();
     float getBME280Temperature();
-    float getBME280Pressure();
-    float getThermoTankSetTemp() { return 0.0f; }
+    Monitoring::MilliCelsius getThermoTankSetTemp() { return target_temperature_int; }
 
     void getThermoMeat1SetTemp(char* data);
     void getThermoMeat2SetTemp(char* data);
@@ -70,7 +71,7 @@ public:
 
     Monitoring::MilliCelsius readThermometers(uint8_t sensor_index);
     void reset();
-    void setThermoTankSetTemp(float temp) { return; }
+    void setThermoTankSetTemp(float temp);
     void setThermoMeat1SetTime(char* time);
     void setThermoMeat2SetTime(char* time);
     void setThermoMeat1SetTemp(float temp) { return; }
@@ -79,6 +80,9 @@ public:
     bool isProbe1Connected() { return GPIO::digitalRead(MCP23017Pins::PROBE_DETECT1_PIN) == 1; }
     bool isProbe2Connected() { return GPIO::digitalRead(MCP23017Pins::PROBE_DETECT2_PIN) == 1; }
     bool isProbe3Connected() { return GPIO::digitalRead(MCP23017Pins::PROBE_DETECT3_PIN) == 1; }
+
+    void setCookerState(bool active) { cooker_state = active; }
+    bool getCookerState() { return cooker_state; }
 
     /**
      * @brief Reads all the sensors and updates the data

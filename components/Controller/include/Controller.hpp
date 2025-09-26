@@ -17,9 +17,9 @@
 #define COOKER_INTERVAL 500
 #define THERMOCOUPLE_UPDATE_INTERVAL 5000
 #define INACTIVE_TIMEOUT 20000
-#define PAGE_COUNT 5
+#define PAGE_COUNT 6
 
-const uint8_t PAGE_OPTION_COUNT[PAGE_COUNT] = {0, 2, 5, 12, 5};
+const uint8_t PAGE_OPTION_COUNT[PAGE_COUNT] = {0, 2, 5, 12, 5, 3};
 
 class Controller
 {

@@ -72,7 +72,6 @@ void mainRoutine(void *pvParameter) {
 
         if ((task_flag & 0x40) >> 6) { // ~10 Hz Controller
             controller.run();
-
             // reset the flag
             task_flag -= 0x40;
         }
@@ -102,9 +101,6 @@ extern "C" void app_main() {
     initWatchdog();
 
     initSystem();
-
-    fan.setSpeed(900);
-    fan.turnOn();
 
     xTaskCreate(runWatchdog, "runWatchdog", 1024, NULL, 6, NULL);
     xTaskCreate(mainRoutine, "mainRoutine", KB_STACK_SIZE * 1024, NULL, 4, NULL);

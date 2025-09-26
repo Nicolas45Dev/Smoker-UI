@@ -18,6 +18,10 @@ Model* Model::getInstance() {
     return _instance;
 }
 
+void Model::setThermoTankSetTemp(float temp) {
+    target_temperature_int = static_cast<Monitoring::MilliCelsius>(temp * 100.0f);
+}
+
 Monitoring::MilliCelsius Model::readThermometers(uint8_t sensor_index) {
     Monitoring::MilliCelsius temp = 0;
     switch (sensor_index) {

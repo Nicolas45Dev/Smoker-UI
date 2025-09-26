@@ -2,6 +2,7 @@
 #define CONSOLE_REGISTER_H
 
 #include "sdkconfig.h"
+#include "Config.h"
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
@@ -10,6 +11,7 @@
 #include "driver/uart.h"
 #include "esp_log.h"
 #include <inttypes.h>
+#include <GPIO.hpp>
 
 #define CLI_TAG "console"
 
@@ -33,29 +35,6 @@ static inline int cli_check_value_limits(int min, int max, int val) {
 #define CLI_CHECK_VALUE_LIMITS(min, max, val) cli_check_value_limits((int)(min), (int)(max), (int)(val))
 
 #ifdef CONFIG_APP_CONSOLE_ENABLED
-
-/**
- * @brief Set the LED intensity using the name and intensity value
- * 
- * @param argc Argument count
- * @param argv Argument values, Should contain intensity and name
- * @return int 0 on success, non-zero on failure
- */
-static int cmd_set_led(int argc, char **argv)
-{
-    if (argc < 3) {
-        printf("Usage: set_led <intensity> <name>\n");
-        return 1;
-    }
-    int intensity = atoi(argv[1]);
-    const char *name = argv[2];
-    uint8_t res = CLI_CHECK_VALUE_LIMITS(0, 100, intensity);
-    if (res) {
-        return res;
-    }
-    ESP_LOGI("set_led", "Setting LED '%s' to intensity %d", name, intensity);
-    return 0;
-}
 
 /**
  * @brief Get the temperature reading from a specified sensor
@@ -115,7 +94,7 @@ static int cmd_set_relay(int argc, char **argv)
     }
     int relay_number = atoi(argv[1]);
     const char *state = argv[2];
-    uint8_t res = CLI_CHECK_VALUE_LIMITS(0, 10, relay_number); // Assuming max 10 relays
+    uint8_t res = CLI_CHECK_VALUE_LIMITS(0, 2, relay_number); // Assuming max 2 relays
     if (res) {
         return res;
     }
@@ -124,6 +103,7 @@ static int cmd_set_relay(int argc, char **argv)
         return 1;
     }
     ESP_LOGI("set_relay", "Setting relay %d to state '%s'", relay_number, state);
+    GPIO::digitalWrite((MCP23017Pins::RELAY1_PIN + relay_number), strcmp(state, "on") == 0 ? 1 : 0);
     return 0;
 }
 
@@ -184,14 +164,6 @@ static int cmd_adc_calib(int argc, char **argv)
 
 static void register_commands()
 {
-    const esp_console_cmd_t cmd = {
-        .command = "set_led",
-        .help = "Set an LED intensity. Usage: set_led <intensity 0-99> <name>",
-        .hint = NULL,
-        .func = &cmd_set_led,
-        .argtable = NULL,
-    };
-
     const esp_console_cmd_t temperature_cmd = {
         .command = "temp",
         .help = "Get temperature readings <sensor_name>",
@@ -240,8 +212,6 @@ static void register_commands()
         .argtable = NULL,
     };
 
-
-    ESP_ERROR_CHECK(esp_console_cmd_register(&cmd));
     ESP_ERROR_CHECK(esp_console_cmd_register(&temperature_cmd));
     ESP_ERROR_CHECK(esp_console_cmd_register(&fan_cmd));
     ESP_ERROR_CHECK(esp_console_cmd_register(&motor_cmd));

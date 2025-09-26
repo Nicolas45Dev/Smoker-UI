@@ -1,3 +1,3 @@
 idf_component_register(SRCS "Cooker.cpp"
                     INCLUDE_DIRS "include"
-                    REQUIRES Model Monitoring Motor)
+                    REQUIRES Model Monitoring Motor Model)

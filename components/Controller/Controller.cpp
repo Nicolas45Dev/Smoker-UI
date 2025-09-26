@@ -76,6 +76,9 @@ void Controller::updateView() {
         case 5:
             page_option_max = PAGE_OPTION_COUNT[4];
             //view.drawSavePage(option_change);
+        case 6:
+            page_option_max = PAGE_OPTION_COUNT[5];
+            view.drawProbeSelectionPage(option_change);
             break;
         default:
             break;
@@ -101,6 +104,9 @@ void Controller::setPageChange() {
             break;
         case 3:
             setMeatProfilePageFromOption();
+            break;
+        case 6:
+            page_index = 1;
             break;
         default:
             page_index = 1;
@@ -141,10 +147,8 @@ void Controller::setMeatProfilePageFromOption() {
     default:
         // set meat profile
         model->setThermoTankSetTemp(view.getMeatProfileData(option_change).tank_temp);
-        model->setThermoMeat1SetTemp(view.getMeatProfileData(option_change).meat_temp);
-        model->setThermoMeat2SetTemp(view.getMeatProfileData(option_change).meat_temp);
 
-        page_index = 1; // Go back to main page
+        page_index = 6; // Go back to probe selection page
 
         break;
     }

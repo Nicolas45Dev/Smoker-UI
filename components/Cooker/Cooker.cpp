@@ -10,7 +10,7 @@ void Cooker::state_starting()
 {
     GPIO::digitalWrite(MCP23017Pins::EN_MOTOR_PIN, 1); // Enable motor driver
 
-    m_motor.setTargetSpeed(750);
+    m_motor.setTargetSpeed(MOTOR_SPEED);
 
     if (!m_motor.isSoftStarting())
     {
@@ -20,15 +20,19 @@ void Cooker::state_starting()
     if (m_motor.isRunning())
     {
         m_state = ACTIVE;
+        m_previous_tick_motor = m_tick;
     }
 }
 
 void Cooker::state_active()
 {
-    // Temperature control logic every INTERVAL_TEMP_CONTROL ticks
-    if (m_tick % INTERVAL_TEMP_CONTROL == 0)
+    // Run the motor at target speed with the target duty cycle
+    if (m_tick - m_previous_tick_motor >= m_duty_cycle_ticks)
     {
-        // Temperature control logic here
+        m_previous_tick_motor = m_tick;
+    }
+    else {
+        m_state = PAUSE;
     }
 }
 
@@ -42,7 +46,27 @@ void Cooker::state_control()
 
 }
 
-void Cooker::state_stopping()
+void Cooker::state_filling()
+{
+    // We assumed the filling comes after a soft start
+    // The motor should run for the MOTOR_FILL_TIMEOUT duration
+    if (m_tick - m_previous_tick_motor >= MOTOR_FILL_TIMEOUT)
+    {
+        m_state = STOP;
+        m_previous_tick_motor = m_tick;
+    }
+}
+
+void Cooker::state_waiting()
+{
+    if (m_tick - m_previous_tick_motor >= (MOTOR_CYCLE - m_duty_cycle_ticks))
+    {
+        m_state = ACTIVE;
+        m_previous_tick_motor = m_tick;
+    }
+}
+
+void Cooker::state_stopping(bool restart)
 {
     if (!m_motor.isSoftStopping())
     {
@@ -52,7 +76,33 @@ void Cooker::state_stopping()
     if (!m_motor.isRunning())
     {
         m_state = STANDBY;
+        if (restart)
+        {
+            m_state = WAITING;
+        }
     }
+}
+
+void Cooker::temperatureToIntensity()
+{
+    Monitoring::MilliCelsius temp = m_model->getThermoTankSetTemp();
+    COOKER_INTENSITY intensity = COOKER_INTENSITY::COOKER_LOW;
+
+    // Transform the temperature to cooker intensity
+    if (temp < 8000) {
+        intensity = COOKER_INTENSITY::COOKER_LOW;
+    }
+    else if (temp >= 8000 && temp < 12000) {
+        intensity = COOKER_INTENSITY::COOKER_MIDLOW;
+    }
+    else if (temp >= 12000 && temp < 16000) {
+        intensity = COOKER_INTENSITY::COOKER_MEDIUM;
+    }
+    else {
+        intensity = COOKER_INTENSITY::COOKER_HIGH;
+    }
+
+    m_intensity = intensity;
 }
 
 // Public functions
@@ -91,6 +141,17 @@ void Cooker::cooker_work()
         case CONTROL:
             state_control();
             break;
+        case FILLING:
+            state_filling();
+            break;
+        case STOP:
+            state_stopping();
+            break;
+        case WAITING:
+            break;
+        case PAUSE:
+            state_stopping(true);
+            break;
         default:
             m_state = STANDBY;
             break;
@@ -98,5 +159,18 @@ void Cooker::cooker_work()
 
     m_motor.motorRoutine();
 
+    // If the model cooker state is different from the current cooker state, we need to change it
+    if (m_model->getCookerState() != m_is_active && m_model->getCookerState())
+    {
+        m_state = STARTING;
+        temperatureToIntensity();
+    }
+
     m_tick++;
+}
+
+void Cooker::set_intensity(COOKER_INTENSITY intensity)
+{
+    m_intensity = intensity;
+    m_duty_cycle_ticks = (MOTOR_CYCLE * m_intensity) / 100;
 }

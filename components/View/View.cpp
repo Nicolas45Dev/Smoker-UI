@@ -159,11 +159,9 @@ void View::drawSettingsPage(uint8_t selected_option) {
 
     // Setting for the temperature unit
     u8g2_DrawButtonUTF8(&u8g2, 8, 20, button_style[selected_option == 0], 0, 2, 2, "Temperature unit");
-
     // Purge the pellet burner
     u8g2_DrawButtonUTF8(&u8g2, 8, 36, button_style[selected_option == 1], 0, 2, 2, "Purge burner");
 
-    u8g2_DrawButtonUTF8(&u8g2, 8, 60, button_style[selected_option == 2], 0, 2, 2, "Save");
     u8g2_DrawButtonUTF8(&u8g2, 90, 60, button_style[selected_option == 3], 0, 2, 2, "Exit");
 
     u8g2_SendBuffer(&u8g2);
@@ -171,6 +169,18 @@ void View::drawSettingsPage(uint8_t selected_option) {
 
 void View::drawStandbyPage(uint8_t selected_option) {
     u8g2_ClearBuffer(&u8g2);
+
+    u8g2_SendBuffer(&u8g2);
+}
+
+void View::drawProbeSelectionPage(uint8_t selected_option) {
+    u8g2_ClearBuffer(&u8g2);
+    setPageHeader("Probes");
+
+    u8g2_DrawButtonUTF8(&u8g2, 8, 20, button_style[selected_option == 0], 0, 2, 2, "Probe 1");
+    u8g2_DrawButtonUTF8(&u8g2, 8, 36, button_style[selected_option == 1], 0, 2, 2, "Probe 2");
+
+    u8g2_DrawButtonUTF8(&u8g2, 90, 60, button_style[selected_option == 2], 0, 2, 2, "Back");
 
     u8g2_SendBuffer(&u8g2);
 }

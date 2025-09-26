@@ -91,6 +91,8 @@ public:
      */
     void drawStandbyPage(uint8_t selected_option);
 
+    void drawProbeSelectionPage(uint8_t selected_option);
+
     MeatProfileData getMeatProfileData(uint8_t index) {
         return meat_profile_data[index];
     }
