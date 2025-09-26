@@ -5,7 +5,6 @@
 #include <driver/gpio.h>
 #include "Encoder.hpp"
 #include <esp_log.h>
-#include <Fan.hpp>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 #include <GPIO.hpp>
@@ -24,7 +23,6 @@ const gpio_num_t SANITY_LED_PIN = (gpio_num_t)17;
 Controller controller;
 Model* model;
 Cooker cooker;
-Fan fan;
 
 static uint32_t main_tick = 0;
 static uint8_t task_flag = 0;
@@ -53,7 +51,7 @@ void initSystem() {
     GPIO::init();
     model = Model::getInstance();
     controller.init();
-    fan.init();
+    cooker.init();
 
 #ifdef CONFIG_APP_CONSOLE_ENABLED
     init_console();

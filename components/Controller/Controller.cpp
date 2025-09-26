@@ -169,7 +169,7 @@ void Controller::setPageParams(bool withOption) {
     page_params.temp_tank1 = thermo_tank;
     page_params.temp_meat1 = thermo_meat1;
     page_params.temp_meat2 = thermo_meat2;
-    page_params.set_temp_tank = model->getThermoTankSetTemp();
+    page_params.set_temp_tank = model->getThermoTankSetTemp() / 100.0f;
     page_params.set_temp_meat1 = thermo_meat1_set;
     page_params.set_temp_meat2 = thermo_meat2_set;
     page_params.time_meat1 = time_meat_1;

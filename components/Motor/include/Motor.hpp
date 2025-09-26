@@ -12,7 +12,7 @@
 #include "sdkconfig.h"
 
 #define MOTOR_PWM_FREQ_HZ 25000
-#define MOTOR_DEFAULT_PWM 0
+#define MOTOR_DEFAULT_PWM 700
 #define MOTOR_MAX_PWM 1023
 #define GPIO_MOTOR_PWM (gpio_num_t)CONFIG_MOTOR_PIN_PWM
 #define MOTOR_PIN_ENABLE MCP23017Pins::EN_MOTOR_PIN
@@ -46,8 +46,8 @@ public:
     void init();
     void setSpeed(uint16_t speed);
     void setTargetSpeed(uint16_t speed);
-    uint16_t getSpeed() const { return speed; }
-    uint16_t getTargetSpeed() const { return target_speed; }
+    int16_t getSpeed() const { return speed; }
+    int16_t getTargetSpeed() const { return target_speed; }
     void softStart();
     void softStop();
     void forceStart();
@@ -65,8 +65,8 @@ public:
     void motorRoutine();
 
 private:
-    uint16_t speed = 0;
-    uint16_t target_speed = 0;
+    int16_t speed = 0;
+    int16_t target_speed = 0;
     int16_t step_speed = 0;
     uint16_t soft_step = DEFAULT_SOFT_STEP;
 

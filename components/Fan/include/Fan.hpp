@@ -17,7 +17,7 @@
 #define FAN_MAX_PWM 1023
 #define GPIO_FAN_PWM (gpio_num_t)CONFIG_FAN_PIN_PWM
 #define FAN_PWM_CHANNEL LEDC_CHANNEL_1
-#define FAN_PWM_TIMER LEDC_TIMER_0
+#define FAN_PWM_TIMER LEDC_TIMER_1
 #ifdef __has_include
 #  if __has_include(<esp_idf_version.h>)
 #    include <esp_idf_version.h>

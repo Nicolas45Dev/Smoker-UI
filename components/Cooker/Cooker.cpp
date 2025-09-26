@@ -6,33 +6,34 @@ void Cooker::state_standby()
 {
 }
 
-void Cooker::state_starting()
+void Cooker::state_starting(bool heating)
 {
     GPIO::digitalWrite(MCP23017Pins::EN_MOTOR_PIN, 1); // Enable motor driver
 
-    m_motor.setTargetSpeed(MOTOR_SPEED);
+    m_motor.setTargetSpeed(MOTOR_DEFAULT_PWM);
 
     if (!m_motor.isSoftStarting())
     {
+        m_fan.setSpeed(FAN_MAX_PWM);
+        m_fan.turnOn();
         m_motor.softStart();
     }
 
     if (m_motor.isRunning())
     {
         m_state = ACTIVE;
+        m_is_active = true;
+        if (heating) m_state = HEATING;
         m_previous_tick_motor = m_tick;
     }
 }
 
 void Cooker::state_active()
 {
-    // Run the motor at target speed with the target duty cycle
-    if (m_tick - m_previous_tick_motor >= m_duty_cycle_ticks)
+    if ((m_tick - m_previous_tick_motor) >= m_duty_cycle_ticks)
     {
-        m_previous_tick_motor = m_tick;
-    }
-    else {
         m_state = PAUSE;
+        m_previous_tick_motor = m_tick;
     }
 }
 
@@ -44,6 +45,31 @@ void Cooker::state_purging()
 void Cooker::state_control()
 {
 
+}
+
+void Cooker::state_heating()
+{
+    m_fan.setSpeed(FAN_MAX_PWM);
+    m_fan.turnOn();
+
+    if (m_tick - m_previous_tick_fan >= MOTOR_FILL_TIMEOUT)
+    {
+        // Stop the motor
+        if (!m_motor.isSoftStopping())
+        {
+            m_motor.softStop();
+            m_previous_tick_fan = m_tick;
+        }
+    }
+
+    if (!m_motor.isRunning())
+    {
+        if (m_tick - m_previous_tick_fan >= MOTOR_CYCLE)
+        {
+            m_state = ACTIVE;
+            m_previous_tick_motor = m_tick;
+        }
+    }
 }
 
 void Cooker::state_filling()
@@ -61,7 +87,7 @@ void Cooker::state_waiting()
 {
     if (m_tick - m_previous_tick_motor >= (MOTOR_CYCLE - m_duty_cycle_ticks))
     {
-        m_state = ACTIVE;
+        m_state = STARTING;
         m_previous_tick_motor = m_tick;
     }
 }
@@ -76,12 +102,23 @@ void Cooker::state_stopping(bool restart)
     if (!m_motor.isRunning())
     {
         m_state = STANDBY;
-        if (restart)
-        {
-            m_state = WAITING;
-        }
+        if (restart) m_state = WAITING;
+        m_previous_tick_motor = m_tick;
     }
 }
+
+// Public functions
+
+Cooker::Cooker()
+{
+    m_motor.init();
+    m_fan.init();
+}
+
+Cooker::~Cooker()
+{
+}
+
 
 void Cooker::temperatureToIntensity()
 {
@@ -103,17 +140,7 @@ void Cooker::temperatureToIntensity()
     }
 
     m_intensity = intensity;
-}
-
-// Public functions
-
-Cooker::Cooker()
-{
-    m_motor.init();
-}
-
-Cooker::~Cooker()
-{
+    m_duty_cycle_ticks = (MOTOR_CYCLE * m_intensity) / 100;
 }
 
 void Cooker::cooker_work()
@@ -121,7 +148,6 @@ void Cooker::cooker_work()
     // Read inputs from the model
     m_thermo_tank = 0;
     m_outside_temp = 0;
-    m_is_active = false;
 
     // State machine work
     switch (m_state)
@@ -148,8 +174,9 @@ void Cooker::cooker_work()
             state_stopping();
             break;
         case WAITING:
+            state_waiting();
             break;
-        case PAUSE:
+            case PAUSE:
             state_stopping(true);
             break;
         default:
@@ -160,13 +187,24 @@ void Cooker::cooker_work()
     m_motor.motorRoutine();
 
     // If the model cooker state is different from the current cooker state, we need to change it
-    if (m_model->getCookerState() != m_is_active && m_model->getCookerState())
+    if (m_model->getCookerState() && !m_is_active)
     {
         m_state = STARTING;
         temperatureToIntensity();
     }
+    
+    if (!m_model->getCookerState() && m_is_active)
+    {
+        m_state = STOP;
+    }
 
     m_tick++;
+}
+
+void Cooker::set_intensity(COOKER_INTENSITY intensity)
+{
+    m_intensity = intensity;
+    m_duty_cycle_ticks = (MOTOR_CYCLE * m_intensity) / 100;
 }
 
 void Cooker::set_intensity(COOKER_INTENSITY intensity)

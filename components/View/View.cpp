@@ -59,8 +59,8 @@ void View::drawMainPage(page_params_t &page_params)
 
     // Write the target temperature for the tank under the current temperature
     sprintf(buffer_t1, "%.1f", page_params.set_temp_tank);
-    u8g2_DrawStr(&u8g2, 30, 37, buffer_t1);
-    u8g2_DrawStr(&u8g2, 50, 37, "C");
+    u8g2_DrawStr(&u8g2, 28, 37, buffer_t1);
+    u8g2_DrawStr(&u8g2, 54, 37, "C");
 
     if(page_params.selected_option == 1) {
 

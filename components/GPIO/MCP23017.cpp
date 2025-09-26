@@ -63,8 +63,6 @@ void MCP23017::pinMode(uint8_t pin, uint8_t mode) {
     iodir = (mode == 0) ? (iodir & ~pin_mask) : (iodir | pin_mask); // Set or clear the bit
     reg[2] = 0;
 
-    printf("Writing");
-
     // Read current IODIR register
     gpio_set_level(CS_PIN, 0);
     spi->writeRead(reg, 3, reg, 1, -1);

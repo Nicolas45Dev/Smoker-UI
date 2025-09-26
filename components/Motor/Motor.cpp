@@ -77,6 +77,7 @@ void Motor::motorRoutine() {
         {
             soft_starting = false;
             motor_running = true; // Motor is now running
+            speed = target_speed; // Ensure speed is set to target
         }
     }
 
@@ -88,15 +89,17 @@ void Motor::motorRoutine() {
             if (speed <= 0)
             {
                 speed = 0;
-                ledc_set_duty(MOTOR_PWM_MODE, MOTOR_PWM_CHANNEL, speed);
-                ledc_update_duty(MOTOR_PWM_MODE, MOTOR_PWM_CHANNEL);
             }
-            else 
-            {
-                soft_stopping = false;
-                motor_running = false; // Motor is now stopped
-                // GPIO::digitalWrite(MCP23017Pins::EN_MOTOR_PIN, 0); // Disable motor driver
-            }
+            ledc_set_duty(MOTOR_PWM_MODE, MOTOR_PWM_CHANNEL, speed);
+            ledc_update_duty(MOTOR_PWM_MODE, MOTOR_PWM_CHANNEL);
+        }
+        else 
+        {
+            printf("Motor stopped\n");
+            soft_stopping = false;
+            motor_running = false; // Motor is now stopped
+            speed = 0; // Ensure speed is zero
+            GPIO::digitalWrite(MCP23017Pins::EN_MOTOR_PIN, 0); // Disable motor driver
         }
     }
 }
