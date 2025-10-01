@@ -38,26 +38,8 @@ typedef enum {
     WAITING,
     PAUSE,
     STOP,
-    PAUSE,
     CONTROL
 } COOKER_STATE;
-
-/**
- * @brief Enum for the cooker intensity levels
- * The levels represent the duty cycle of the motor on a 2 minutes cycle.
- * COOKER_LOW:  1% duty cycle (1.2 seconds on, 118.8 seconds off)
- * COOKER_MIDLOW:  3% duty cycle (3.6 seconds on, 116.4 seconds off)
- * COOKER_MEDIUM:  6% duty cycle (7.2 seconds on, 112.8 seconds off)
- * COOKER_MIDHIGH:  9% duty cycle (10.8 seconds on, 109.2 seconds off)
- * COOKER_HIGH:  12% duty cycle (12 seconds on, 108 seconds off)
- */
-typedef enum {
-    COOKER_LOW = 1,
-    COOKER_MIDLOW = 3,
-    COOKER_MEDIUM = 6,
-    COOKER_MIDHIGH = 9,
-    COOKER_HIGH = 12
-} COOKER_INTENSITY;
 
 /**
  * @brief Enum for the cooker intensity levels
@@ -97,7 +79,6 @@ private:
     uint32_t m_duty_cycle_ticks = 0;
 
     COOKER_STATE m_state = STANDBY;
-    COOKER_INTENSITY m_intensity = COOKER_LOW;
     COOKER_INTENSITY m_intensity = COOKER_LOW;
     Motor m_motor;
     Fan m_fan;
@@ -163,11 +144,6 @@ private:
      * 
      */
     void state_control();
-
-    /**
-     * @brief Transform the temperature to intensity
-     */
-    void temperatureToIntensity();
 
 public:
     Cooker();

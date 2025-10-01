@@ -206,9 +206,3 @@ void Cooker::set_intensity(COOKER_INTENSITY intensity)
     m_intensity = intensity;
     m_duty_cycle_ticks = (MOTOR_CYCLE * m_intensity) / 100;
 }
-
-void Cooker::set_intensity(COOKER_INTENSITY intensity)
-{
-    m_intensity = intensity;
-    m_duty_cycle_ticks = (MOTOR_CYCLE * m_intensity) / 100;
-}
