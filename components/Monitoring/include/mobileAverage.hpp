@@ -11,7 +11,7 @@ class MobileAverage {
 public:
     MobileAverage() : values{}, index(0), count(0) {}
 
-    void addValue(T value) {
+    void update(T value) {
         values[index] = value;
         index = (index + 1) % N;
         if (count < N) {

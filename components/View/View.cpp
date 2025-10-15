@@ -52,15 +52,15 @@ void View::drawMainPage(page_params_t &page_params)
     u8g2_DrawStr(&u8g2, 24, 7, "Smoker");
 
     // String for temperature tank
-    u8g2_DrawStr(&u8g2, 30, 27, page_params.temp_tank1);
+    u8g2_DrawStr(&u8g2, 36, 27, page_params.temp_tank1);
     u8g2_DrawStr(&u8g2, 50, 27, "C");
 
     u8g2_DrawLine(&u8g2, 26, 29, 56, 29);
 
     // Write the target temperature for the tank under the current temperature
-    sprintf(buffer_t1, "%.1f", page_params.set_temp_tank);
-    u8g2_DrawStr(&u8g2, 28, 37, buffer_t1);
-    u8g2_DrawStr(&u8g2, 54, 37, "C");
+    sprintf(buffer_t1, "%.0f", page_params.set_temp_tank);
+    u8g2_DrawStr(&u8g2, 36, 37, buffer_t1);
+    u8g2_DrawStr(&u8g2, 50, 37, "C");
 
     if(page_params.selected_option == 1) {
 
@@ -169,7 +169,6 @@ void View::drawSettingsPage(uint8_t selected_option) {
 
 void View::drawStandbyPage(uint8_t selected_option) {
     u8g2_ClearBuffer(&u8g2);
-
     u8g2_SendBuffer(&u8g2);
 }
 

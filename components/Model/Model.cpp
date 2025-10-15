@@ -71,11 +71,11 @@ void Model::reset() {
 void Model::update() {
     Monitoring::readTemperature_probe1();
     Monitoring::readTemperature_probe2();
-    Monitoring::readInternalTemperature();
+    temperature_tint = Monitoring::readInternalTemperature();
 
     if (bme280_tick >= BME280_UPDATE_PERIOD_TICK) {
         bme280.readAll();
-        temperature_average.addValue(bme280.getTemperature());
+        temperature_average.update(bme280.getTemperature());
         bme280_tick = 0;
     }
 

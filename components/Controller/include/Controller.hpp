@@ -59,7 +59,6 @@ private:
 
     View view;
     Model* model;
-    Cooker cooker;
     page_params_t page_params;
 
     void updateView();

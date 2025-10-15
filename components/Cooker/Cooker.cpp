@@ -1,5 +1,7 @@
 #include "Cooker.hpp"
 
+Cooker g_instance_cooker;
+
 // Private functions for the state machine's states
 
 void Cooker::state_standby()
@@ -42,9 +44,19 @@ void Cooker::state_purging()
 
 }
 
-void Cooker::state_control()
+void Cooker::state_control(uint32_t target_speed)
 {
+    // Manually control the motor speed
+    if (target_speed == 0) {
+        m_motor.softStop();
+        return;
+    }
+    m_motor.setTargetSpeed(target_speed);
 
+    if (!m_motor.isSoftStarting() && !m_motor.isRunning())
+    {
+        m_motor.softStart();
+    }
 }
 
 void Cooker::state_heating()
@@ -52,7 +64,7 @@ void Cooker::state_heating()
     m_fan.setSpeed(FAN_MAX_PWM);
     m_fan.turnOn();
 
-    if (m_tick - m_previous_tick_fan >= MOTOR_FILL_TIMEOUT)
+    if (m_tick - m_previous_tick_motor >= MOTOR_FILL_TIMEOUT)
     {
         // Stop the motor
         if (!m_motor.isSoftStopping())
@@ -64,7 +76,8 @@ void Cooker::state_heating()
 
     if (!m_motor.isRunning())
     {
-        if (m_tick - m_previous_tick_fan >= MOTOR_CYCLE)
+        // After the motor is stopped, we wait an other 4 minutes before closing the fan and the heating element
+        if (m_tick - m_previous_tick_fan >= FAN_TIMEOUT)
         {
             m_state = ACTIVE;
             m_previous_tick_motor = m_tick;
@@ -164,9 +177,6 @@ void Cooker::cooker_work()
         case PURGING:
             state_purging();
             break;
-        case CONTROL:
-            state_control();
-            break;
         case FILLING:
             state_filling();
             break;
@@ -176,7 +186,7 @@ void Cooker::cooker_work()
         case WAITING:
             state_waiting();
             break;
-            case PAUSE:
+        case PAUSE:
             state_stopping(true);
             break;
         default:

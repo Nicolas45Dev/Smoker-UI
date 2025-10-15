@@ -22,7 +22,6 @@ const gpio_num_t SANITY_LED_PIN = (gpio_num_t)17;
 
 Controller controller;
 Model* model;
-Cooker cooker;
 
 static uint32_t main_tick = 0;
 static uint8_t task_flag = 0;
@@ -51,7 +50,7 @@ void initSystem() {
     GPIO::init();
     model = Model::getInstance();
     controller.init();
-    cooker.init();
+    g_instance_cooker.init();
 
 #ifdef CONFIG_APP_CONSOLE_ENABLED
     init_console();
@@ -79,7 +78,7 @@ void mainRoutine(void *pvParameter) {
             task_flag -= 0x80;
         }
         if ((task_flag & 0x20) >> 5) { // ~100 Hz Cooker
-            cooker.cooker_work();
+            g_instance_cooker.cooker_work();
             // reset the flag
             task_flag -= 0x20;
         }

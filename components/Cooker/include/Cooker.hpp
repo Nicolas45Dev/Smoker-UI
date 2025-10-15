@@ -27,6 +27,7 @@
 #define MOTOR_SPEED 380
 #define MOTOR_CYCLE 12000 // 2 minutes cycle
 #define INTERVAL_TEMP_CONTROL 100
+#define FAN_TIMEOUT 24000
 
 typedef enum {
     STANDBY,
@@ -143,7 +144,7 @@ private:
      * @brief Define the behavior of the cooker in the control state
      * 
      */
-    void state_control();
+    void state_control(uint32_t target_speed);
 
 public:
     Cooker();
@@ -168,5 +169,7 @@ public:
         m_duty_cycle_ticks = (MOTOR_CYCLE * m_intensity) / 100;
     }
 };
+
+extern Cooker g_instance_cooker;
 
 #endif

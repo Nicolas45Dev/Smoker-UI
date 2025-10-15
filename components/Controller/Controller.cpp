@@ -112,7 +112,6 @@ void Controller::setPageChange() {
             page_index = 1;
             break;
         }
-
         option_change = 0;
     }
 
@@ -147,9 +146,9 @@ void Controller::setMeatProfilePageFromOption() {
     default:
         // set meat profile
         model->setThermoTankSetTemp(view.getMeatProfileData(option_change).tank_temp);
+        g_instance_cooker.set_active(true);
 
         page_index = 6; // Go back to probe selection page
-
         break;
     }
 }
@@ -180,16 +179,11 @@ void Controller::setPageParams(bool withOption) {
 }
 
 void Controller::updateFromModel() {
-    Monitoring::MilliCelsius temp1 = model->readThermometers(0);
-    Monitoring::MilliCelsius temp2 = model->readThermometers(1);
+    // Monitoring::MilliCelsius temp1 = model->readThermometers(0);
+    // Monitoring::MilliCelsius temp2 = model->readThermometers(1);
     Monitoring::MilliCelsius temp3 = model->readThermometers(2);
 
-    // Put the temperature in the char array
-    if (model->isProbe1Connected()) {
-        sprintf(thermo_tank, "%.1f", temp1 / 100.0f);
-    } else {
-        sprintf(thermo_tank, "----");
-    }
+    sprintf(thermo_tank, "%.0f", temp3 / 1000.0f);
 
     // Read BME280 data
     float bme_temp = model->getBME280Temperature();
